@@ -147,13 +147,13 @@ class ScraperActor extends Actor with Logging {
    */
   def extractImages(doc: Document, takeFirst: Int = 5): Seq[String] = {
     if (!doc.select("meta[property=og:image]").attr("content").isEmpty()) {
-      val ogImageSrcs = doc.select("meta[property=og:image]").iterator().asScala.take(takeFirst).toSeq.map(_.attr("content"))
+      val ogImageSrcs = doc.select("meta[property=og:image]").iterator().asScala.take(takeFirst).toSeq.map(_.attr("abs:content"))
       if (ogImageSrcs.size < takeFirst)
-        ogImageSrcs ++ doc.select("img[src]").iterator().asScala.take(takeFirst - ogImageSrcs.size).toSeq.map(_.attr("src"))
+        ogImageSrcs ++ doc.select("img[src]").iterator().asScala.take(takeFirst - ogImageSrcs.size).toSeq.map(_.attr("abs:src"))
       else
         ogImageSrcs
     } else {
-      doc.select("img[src]").iterator().asScala.take(takeFirst).toSeq.map(_.attr("src"))
+      doc.select("img[src]").iterator().asScala.take(takeFirst).toSeq.map(_.attr("abs:src"))
     }
   }
 
