@@ -7,7 +7,7 @@ A Scala library built on Akka actors and [jsoup](http://jsoup.org/) that allows 
 Add the following to your `build.sbt`
 
 ```scala
-libraryDependencies += "com.beachape.metascraper" %% "metascraper" % "0.0.1"
+libraryDependencies += "com.beachape.metascraper" %% "metascraper" % "0.0.2"
 ```
 
 If the above does not work because it cannot be resolved, its likely because it hasn't been synced to Maven central yet.
@@ -16,7 +16,7 @@ In that case, download a SNAPSHOT release of the same version by adding this to 
 ```
 resolvers += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
 
-libraryDependencies += "com.beachape.metascraper" %% "metascraper" % "0.0.1-SNAPSHOT"
+libraryDependencies += "com.beachape.metascraper" %% "metascraper" % "0.0.2-SNAPSHOT"
 ```
 
 ## Example usage
@@ -37,10 +37,18 @@ implicit val dispatcher = system.dispatcher
 val scraperActor = system.actorOf(ScraperActor())
 
 for {
-  future <- ask(scraperActor, ScrapeUrl("http://bbc.co.uk")).mapTo[ScrapedData]
+  future <- ask(scraperActor, ScrapeUrl("https://bbc.co.uk")).mapTo[Either[FailedToScrapeUrl,ScrapedData]]
 } {
-  println("Image URLs: ")
-  future.imageUrls.foreach(println)
+  future match {
+    case Left(failed) => {
+      println("Failed: ")
+      println(failed.message)
+    }
+    case Right(data) => {
+      println("Image urls")
+      data.imageUrls.foreach(println)
+    }
+  }
 }
 
 /*
