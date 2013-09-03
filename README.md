@@ -1,4 +1,4 @@
-# Metascraper
+# Metascraper [![Build Status](https://travis-ci.org/lloydmeta/metascraper.png?branch=master)](https://travis-ci.org/lloydmeta/metascraper)
 
 A Scala library built on Akka actors and [jsoup](http://jsoup.org/) that allows you to retrieve meta data from pages at specified URLs, prioritising [Open Graph tags](http://ogp.me/) over traditional tags if they exist.
 
