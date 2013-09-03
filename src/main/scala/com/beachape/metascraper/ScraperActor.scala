@@ -42,8 +42,14 @@ class ScraperActor extends Actor with Logging {
         sender ! scrapedData
       } catch {
         case ioe: IOException => {
-          logger.error(s"Failed to retrieve page at url: ${message.url}")
-          sender ! FailedToScrapeUrl(message.url)
+          val errorMessage = s"Failed to retrieve page at url: ${message.url}"
+          logger.error(errorMessage)
+          sender ! FailedToScrapeUrl(errorMessage)
+        }
+        case e: Exception => {
+          val errorMessage = e.getMessage
+          logger.error(errorMessage)
+          sender ! FailedToScrapeUrl(errorMessage)
         }
       }
     }

@@ -15,5 +15,5 @@ object Messages {
                                  description: String,
                                  mainImageUrl: Url,
                                  imageUrls: Seq[Url])
-  sealed case class FailedToScrapeUrl(url: Url)
+  sealed case class FailedToScrapeUrl(message: String)
 }
