@@ -2,6 +2,8 @@
 
 A Scala library built on Akka actors and [jsoup](http://jsoup.org/) that allows you to retrieve meta data from pages at specified URLs, prioritising [Open Graph tags](http://ogp.me/) over traditional tags if they exist.
 
+Tested against Scala 2.10.x, OpenJDK 6 and 7, and Oracle JDK 7.
+
 ## Installation
 
 Add the following to your `build.sbt`
@@ -61,6 +63,10 @@ for {
   http://news.bbcimg.co.uk/media/images/69612000/jpg/_69612953_69612952.jpg
 */
 ```
+
+## Example application
+
+[Metascraper-service](https://github.com/lloydmeta/metascraper-service): a RESTful Play2 service that uses this library to scrape data from a requested URL, taking advantage of the tight integration that Play2 has with Akka.
 
 ## Licence
 
