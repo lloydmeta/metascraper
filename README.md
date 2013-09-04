@@ -29,7 +29,7 @@ import akka.pattern.ask
 import akka.util.Timeout
 import scala.concurrent.duration._
 
-implicit val timeout = Timeout(5 seconds)
+implicit val timeout = Timeout(30 seconds)
 
 implicit val system = ActorSystem("actorSystem")
 implicit val dispatcher = system.dispatcher
