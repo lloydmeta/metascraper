@@ -119,10 +119,12 @@ class ScraperActor extends Actor with Logging {
    * @return String description
    */
   def extractDescription(doc: Document): String = {
-    if (!doc.select("meta[property=og:description]").attr("content").isEmpty()) {
+    if (!doc.select("meta[property=og:description]").attr("content").isEmpty) {
       doc.select("meta[property=og:description]").attr("content")
-    } else {
+    } else if (!doc.select("meta[name=description]").attr("content").isEmpty) {
       doc.select("meta[name=description]").attr("content")
+    } else {
+      doc.select("p").text
     }
   }
 

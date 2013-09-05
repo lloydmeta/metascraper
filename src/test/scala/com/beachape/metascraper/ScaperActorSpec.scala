@@ -26,6 +26,9 @@ class ScraperActorSpec extends TestKit(ActorSystem("testSystem"))
   lazy val withoutAnyTagsSource = Source.fromURL(getClass.getResource("/withoutAnyTags.html"))
   lazy val withoutAnyTagsDoc = Jsoup.parse(withoutAnyTagsSource.mkString)
 
+  lazy val withOnlyPTag = Source.fromURL(getClass.getResource("/withOnlyPTag.html"))
+  lazy val withOnlyPTagDoc = Jsoup.parse(withOnlyPTag.mkString)
+
   describe("#extractUrl") {
 
     describe("for a page without og:url") {
@@ -89,6 +92,12 @@ class ScraperActorSpec extends TestKit(ActorSystem("testSystem"))
         scraperActor.extractDescription(withOgTagsDoc) should be("Description inside og:description tag")
       }
 
+    }
+
+    describe("for a page without og:description and meta description tags but has a paragraph tag") {
+      it("should return an empty string") {
+        scraperActor.extractDescription(withOnlyPTagDoc) should include("is an object-functional programming and scripting language for general software applications")
+      }
     }
 
     describe("for a page without og:description and meta description tags") {
