@@ -124,7 +124,11 @@ class ScraperActor extends Actor with Logging {
     } else if (!doc.select("meta[name=description]").attr("content").isEmpty) {
       doc.select("meta[name=description]").attr("content")
     } else {
-      doc.select("p").text
+      val firstParagraph = doc.select("p").text
+      if (firstParagraph.length > 300)
+        s"${firstParagraph.take(300)}..."
+      else
+        firstParagraph
     }
   }
 
