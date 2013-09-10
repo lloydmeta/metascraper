@@ -4,7 +4,12 @@ import co.freeside.betamax.TapeMode
 import co.freeside.betamax.Recorder
 import co.freeside.betamax.proxy.jetty.ProxyServer
 
-// Shamelessly cargo-culted/stolen from http://www.scottlogic.com/blog/2013/07/18/betamax-in-scala.html
+/**
+ * Trait that allows us to run a block of code under the "context" of a Betamax
+ * recorded tape.
+ *
+ * Extends Wrapped to allow "_ using betamax("tapeName") { .. }" syntax
+ */
 trait Betamax extends Wrapped {
 
   def betamax(tape: String, mode: Option[TapeMode] = None)(testFun: => Unit) = {
