@@ -41,12 +41,6 @@ class ScraperActorSpec extends TestKit(ActorSystem("testSystem"))
       doc.baseUri() should be ("http://www.beachape.com/about/")
     }
 
-    // Tests might fail in the future if this site ever updates
-    it("should return a document at the redireted URL for a URL that has redirects in meta tags") _ using betamax("test-amerisourcebergendrug.com", Some(TapeMode.READ_ONLY)){
-      val doc = scraperActor.getDocument(ScrapeUrl("http://www.amerisourcebergendrug.com/"))
-      doc.baseUri() should be ("http://www.amerisourcebergendrug.com/abcdrug/")
-    }
-
   }
 
   describe("#extractUrl") {
