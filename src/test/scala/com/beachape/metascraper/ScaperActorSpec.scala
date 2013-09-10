@@ -8,12 +8,15 @@ import akka.actor.ActorSystem
 import scala.io.Source
 import org.jsoup.Jsoup
 import com.beachape.metascraper.Messages.ScrapeUrl
+import com.beachape.support.Betamax
+import co.freeside.betamax.TapeMode
 
 class ScraperActorSpec extends TestKit(ActorSystem("testSystem"))
   with FunSpec
   with ShouldMatchers
   with BeforeAndAfter
-  with ImplicitSender {
+  with ImplicitSender
+  with Betamax {
 
   val scraperActorRef = TestActorRef(new ScraperActor)
   val scraperActor = scraperActorRef.underlyingActor
@@ -32,14 +35,15 @@ class ScraperActorSpec extends TestKit(ActorSystem("testSystem"))
 
   describe("#getDocument") {
 
-    describe("should return a document at the requested URL for a normal URL that does not redirect") {
-      val doc = scraperActor.getDocument(ScrapeUrl("http://www.beachape.com"))
-      doc.baseUri() should be ("http://www.beachape.com")
+    // Make sure to use a trailing slash at the end .. https://github.com/robfletcher/betamax/issues/61
+    it("should return a document at the requested URL for a normal URL that does not redirect") _ using betamax("test-beachape.com", Some(TapeMode.READ_ONLY)) {
+      val doc = scraperActor.getDocument(ScrapeUrl("http://www.beachape.com/about/"))
+      doc.baseUri() should be ("http://www.beachape.com/about/")
     }
 
     // Tests might fail in the future if this site ever updates
-    describe("should return a document at the redireted URL for a URL that has redirects in meta tags") {
-      val doc = scraperActor.getDocument(ScrapeUrl("http://www.amerisourcebergendrug.com"))
+    it("should return a document at the redireted URL for a URL that has redirects in meta tags") _ using betamax("test-amerisourcebergendrug.com", Some(TapeMode.READ_ONLY)){
+      val doc = scraperActor.getDocument(ScrapeUrl("http://www.amerisourcebergendrug.com/"))
       doc.baseUri() should be ("http://www.amerisourcebergendrug.com/abcdrug/")
     }
 
