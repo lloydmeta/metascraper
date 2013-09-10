@@ -7,6 +7,7 @@ import java.io.IOException
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import scala.collection.JavaConverters._
+import scala.annotation.tailrec
 
 /**
  * Companion object for instantiating ScaperActors
@@ -33,10 +34,7 @@ class ScraperActor extends Actor with Logging {
 
     case message: ScrapeUrl => {
       try {
-        val document = Jsoup.connect(message.url).
-          userAgent(message.userAgent).
-          header("Accept-Language", message.acceptLanguageCode).
-          get()
+        val document = getDocument(message)
         val scrapedData = extractScrapedData(document, message.url)
         logger.info(s"Scraped data: ${scrapedData}")
         sender ! Right(scrapedData)
@@ -55,6 +53,28 @@ class ScraperActor extends Actor with Logging {
     }
 
     case _ => logger.error("Scraper Actor received an unexpected message :( !")
+  }
+
+  /**
+   * Returns a Jsoup Document
+   *
+   * Follows redirects in location headers and in meta tags until
+   * we get to the final document
+   *
+   * @param message ScrapeUrl message
+   * @return document Jsoup document
+   */
+  @tailrec final def getDocument(message: ScrapeUrl): Document = {
+    val document = Jsoup.connect(message.url).
+      followRedirects(true).
+      userAgent(message.userAgent).
+      header("Accept-Language", message.acceptLanguageCode).
+      get()
+    val metaRefreshTags = document.select("meta[http-equiv=REFRESH]")
+    if (metaRefreshTags.size > 0 && !metaRefreshTags.attr("content").isEmpty)
+      getDocument(ScrapeUrl(metaRefreshTags.attr("content").split("=")(1), userAgent = message.userAgent, acceptLanguageCode = message.acceptLanguageCode))
+    else
+      document
   }
 
   /**

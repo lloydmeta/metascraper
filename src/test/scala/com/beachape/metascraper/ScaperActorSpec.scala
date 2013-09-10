@@ -7,6 +7,7 @@ import akka.testkit.{TestActorRef, TestKit, ImplicitSender}
 import akka.actor.ActorSystem
 import scala.io.Source
 import org.jsoup.Jsoup
+import com.beachape.metascraper.Messages.ScrapeUrl
 
 class ScraperActorSpec extends TestKit(ActorSystem("testSystem"))
   with FunSpec
@@ -28,6 +29,21 @@ class ScraperActorSpec extends TestKit(ActorSystem("testSystem"))
 
   lazy val withOnlyPTag = Source.fromURL(getClass.getResource("/withOnlyPTag.html"))
   lazy val withOnlyPTagDoc = Jsoup.parse(withOnlyPTag.mkString)
+
+  describe("#getDocument") {
+
+    describe("should return a document at the requested URL for a normal URL that does not redirect") {
+      val doc = scraperActor.getDocument(ScrapeUrl("http://www.beachape.com"))
+      doc.baseUri() should be ("http://www.beachape.com")
+    }
+
+    // Tests might fail in the future if this site ever updates
+    describe("should return a document at the redireted URL for a URL that has redirects in meta tags") {
+      val doc = scraperActor.getDocument(ScrapeUrl("http://www.amerisourcebergendrug.com"))
+      doc.baseUri() should be ("http://www.amerisourcebergendrug.com/abcdrug/")
+    }
+
+  }
 
   describe("#extractUrl") {
 
