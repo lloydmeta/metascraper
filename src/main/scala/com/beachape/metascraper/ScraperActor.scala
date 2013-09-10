@@ -72,7 +72,7 @@ class ScraperActor extends Actor with Logging {
       get()
     val metaRefreshTags = document.select("meta[http-equiv=REFRESH]")
     if (metaRefreshTags.size > 0 && !metaRefreshTags.attr("content").isEmpty)
-      getDocument(ScrapeUrl(metaRefreshTags.attr("content").split("=")(1), userAgent = message.userAgent, acceptLanguageCode = message.acceptLanguageCode))
+      getDocument(ScrapeUrl(metaRefreshTags.attr("abs:content").split("=")(1), userAgent = message.userAgent, acceptLanguageCode = message.acceptLanguageCode))
     else
       document
   }
