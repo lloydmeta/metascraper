@@ -39,7 +39,7 @@ implicit val dispatcher = system.dispatcher
 val scraperActor = system.actorOf(ScraperActor())
 
 for {
-  future <- ask(scraperActor, ScrapeUrl("https://bbc.co.uk")).mapTo[Either[FailedToScrapeUrl,ScrapedData]]
+  future <- ask(scraperActor, ScrapeUrl("https://bbc.co.uk")).mapTo[Either[Throwable,ScrapedData]]
 } {
   future match {
     case Left(throwable) => {
