@@ -18,32 +18,24 @@ import com.ning.http.client.{AsyncHttpClientConfig, AsyncHttpClient}
  */
 object ScraperActor {
 
-  lazy val maxConnections = 30
-  lazy val connectionPooling = true
-  lazy val connectionTimeoutInMs = 10000
-  lazy val requestTimeoutInMs = 20000
-  lazy val compressionEnabled = true
-  lazy val httpExecutorService: ExecutorService = Executors.newFixedThreadPool(10)
-
-  lazy val config = new AsyncHttpClientConfig.Builder()
-    .setExecutorService(httpExecutorService)
-    .setMaximumConnectionsPerHost(maxConnections)
-    .setAllowPoolingConnection(true)
-    .setAllowSslConnectionPool(true)
-    .setConnectionTimeoutInMs(connectionTimeoutInMs)
-    .setRequestTimeoutInMs(requestTimeoutInMs)
-    .setCompressionEnabled(compressionEnabled)
-    .setFollowRedirects(true).build
-
-  lazy val asyncHttpClient = new AsyncHttpClient(config)
-  lazy val http = new Http(asyncHttpClient)
-
   /**
    * Factory method for the params required to instantiate a MonitorActor
    *
+   * @param httpExecutorThreads Int number of threads to use for this actor's async HTTP executor service
+   * @param maxConnectionsPerHost Int max connections at a time per host
+   * @param connectionTimeoutInMs Int time in milliseconds before timing out when trying to make a connection to a host
+   * @param requestTimeoutInMs Int time in milliseconds before timing out when waiting for a request to complete after connection
    * @return Props for instantiating a ScaperActor
    */
-  def apply() = Props[ScraperActor]
+  def apply(httpExecutorThreads: Int = 10,
+            maxConnectionsPerHost: Int = 30,
+            connectionTimeoutInMs: Int = 10000,
+            requestTimeoutInMs: Int = 15000) =
+    Props(
+      classOf[ScraperActor],
+      httpExecutorThreads, maxConnectionsPerHost,
+      connectionTimeoutInMs,
+      requestTimeoutInMs)
 }
 
 /**
@@ -52,12 +44,34 @@ object ScraperActor {
  * Should be instantiated with Props provided via companion object factory
  * method
  */
-class ScraperActor extends Actor with Logging {
+class ScraperActor(
+                    httpExecutorThreads: Int = 10,
+                    maxConnectionsPerHost: Int = 30,
+                    connectionTimeoutInMs: Int = 10000,
+                    requestTimeoutInMs: Int = 15000)
+  extends Actor with Logging {
 
   import context.dispatcher
+  lazy val compressionEnabled = true
 
+  // Validator
   lazy val validSchemas = Seq("http", "https")
   lazy val urlValidator = new UrlValidator(validSchemas.toArray)
+
+  // Http client
+  lazy val connectionPooling = true
+  lazy val httpExecutorService: ExecutorService = Executors.newFixedThreadPool(httpExecutorThreads)
+  lazy val config = new AsyncHttpClientConfig.Builder()
+    .setExecutorService(httpExecutorService)
+    .setMaximumConnectionsPerHost(maxConnectionsPerHost)
+    .setAllowPoolingConnection(true)
+    .setAllowSslConnectionPool(true)
+    .setConnectionTimeoutInMs(connectionTimeoutInMs)
+    .setRequestTimeoutInMs(requestTimeoutInMs)
+    .setCompressionEnabled(compressionEnabled)
+    .setFollowRedirects(true).build
+  lazy val asyncHttpClient = new AsyncHttpClient(config)
+  lazy val httpClient = new Http(asyncHttpClient)
 
   def receive = {
 
@@ -102,7 +116,7 @@ class ScraperActor extends Actor with Logging {
       "User-Agent" -> Seq(message.userAgent),
       "Accept-Language" -> Seq(message.acceptLanguageCode))
     val request = url(message.url).setHeaders(requestHeaders)
-    val resp = ScraperActor.http(request OK as.String).either
+    val resp = httpClient(request OK as.String).either
     for (throwable <- resp.left) yield throwable
   }
 
