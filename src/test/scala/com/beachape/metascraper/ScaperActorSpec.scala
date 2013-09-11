@@ -11,7 +11,6 @@ import com.beachape.metascraper.Messages.{ScrapedData, ScrapeUrl}
 import com.beachape.support.Betamax
 import co.freeside.betamax.TapeMode
 import dispatch._, Defaults._
-import akka.util.Timeout
 import scala.concurrent.duration._
 
 class ScraperActorSpec extends TestKit(ActorSystem("testSystem"))

@@ -1,6 +1,5 @@
 package com.beachape.metascraper
 
-import org.jsoup.nodes.Document
 import akka.actor.ActorRef
 
 /**
@@ -12,7 +11,6 @@ object Messages {
                                url: Url,
                                acceptLanguageCode: String = "en",
                                userAgent: String = "Metascraper")
-  sealed case class ScrapeDocument(document: Document, url: Url, zender: ActorRef)
   sealed case class ScrapeString(string: String, url: Url, zender: ActorRef)
   sealed case class ScrapedData(
                                  url: Url,
