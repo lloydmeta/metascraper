@@ -1,0 +1,26 @@
+!tape
+name: test-beachape.com-non-HTML
+interactions:
+- recorded: 2013-09-11T03:44:10.024Z
+  request:
+    method: GET
+    uri: http://www.beachape.com/downloads/code/scala/schwatcher_example.scala/
+    headers:
+      Accept: text/html, image/gif, image/jpeg, *; q=.2, */*; q=.2
+      Accept-Encoding: gzip
+      Host: www.beachape.com
+      Proxy-Connection: keep-alive
+      User-Agent: Java/1.7.0_25
+  response:
+    status: 403
+    headers:
+      CF-RAY: ac15b9ba489018f
+      Cache-Control: max-age=10
+      Content-Encoding: gzip
+      Content-Type: text/html; charset=UTF-8
+      Date: Wed, 11 Sep 2013 03:44:09 GMT
+      Expires: Wed, 11 Sep 2013 03:44:19 GMT
+      Server: cloudflare-nginx
+      Set-Cookie: __cfduid=d75a6bcfc27abd6f976e73cf12f1dafda1378871049544; expires=Mon, 23-Dec-2019 23:50:00 GMT; path=/; domain=.beachape.com
+    body: !!binary |-
+      H4sIAAAAAAAAA8VXbW/bNhD+7l/BaEDTAqFkGVmbF0tDkaZoPi3YEmxFURiUdLboSKRKUla8rv99R1FOZMXJmmHD8iXk3fHhc8d7kad7734+u/p4eU5yUxbxaLpH6Sc+J4UhF+fkzeeYTK2CpAXTOvKEpEtNOLwmssg4eKRgYhF5IOj1rx7a7n0CkfH5Z0rvoToc/NsJ9eZ5UEdPQB09A2phOjQr2OXlQxRKt5FyYBn+M9wUEL9NU9CaZCA4ZORP0jSNnwBLc1aBn8qS1BrlZ4Wss/cFU0CMJAq0UTw1hLWHp4GDGk1LMIzgUaXBRN711Xt65JFgo8iNqSh8qfkq8s6kMCAMvVpX6HfqdpFn4NYE1qXTO5inUH6n12/pmSwrZnhS9IEuzqPzbAEHaa5kCVHYAxAMBd6KQ1NJZXpnGp6ZPMpgxVOg7eaAC244K6hOWYEoByW75WVdbvYOteDiBmNSRJ426wJ0DoCwPIu8dD5zIppqfJhcwTzygjQTNF3wwKmCdO6DUlJpvzUyGJEuEO2+hIwzhE4VgDiolFxCargU7u6ttD/GrHiUzP49GQ6Wz/7f8uHwfErbqdZCDs/HiczWX0umFlycjE8rlmVcLE7G36aOwi638C5emT7Skq2Yk3pEqxT9sI4sMYo2V+c2V23+BmzJboOCJzpYfqlBrYPQP/bDbuOXXPhYMzFe3WLFjxQdbIjYqvtX2PwBlZFIZuxWu5gMC/d7rr17zFbavibeW8oB+Gg0Dbo+YF8jHmFryviqy1raKFZVoDwr7zRdj0Elpr4yZLOgbbLYbSrlDaZWu+/y30laO49kzDBqFBO6YAZsh2JYtDNnhOQuC2AaiBOTTuxPA7y9x6Nj2N5CMyxoXmBK3rPbUgwceeBKp7bsbTTcyiHIFSjbJO6O2uYdxuett+E4HGMAw75u0sPVdWLxsBjB226xeGpyR6Z1zb4zCfzufvvQG7V2ZWVfbbOytrpi6cBy26vOmjx4yB22qSzqUmhiGtkzesRsy6L1Of4tZ4bk9hIB2U997zqbKr7KgchGIGU5JybnmjSQaI419XI4bV4hlCYJEwhG1rJW3YhBkR1D6FMrTJRsNKh9TTRfCGZqnEsvWRr+mBwn7PDoeBwezWnNJuErTJ9qyy2XTT3JaKDa8TSbeD4ecZcycymNS6F+2KcdgSm+m+idcdYU41B6cW/A/sLW5OLdCdobJcUiHvhlm2QrxwUCPomtoWKKGSzH+EVSF8Xpd5xxfJxyWLE2+DNeefFH+woXlx3cCXkd+uEk9CfhoX84+W+JMcdKKr6gOHqMjDz7SaC9nryda4POq+vKzXvbQLrNzE7Lh40ph6LCqYcDyn7GzBL8oLrx4g8onQbs/4g7ptJcqpKJFGaYjLXiZj1L1tgy7xXkBSurU7JRk2TdXUr+aci6Hn4n66I1jMt96g6jY5Pflt9WMW2VSltRo2HB/TBs463dQ5tN9+7q8un5aAEaLjLZ+DP8FNpE19Z1RL5+Ox21fEdbE9KNxmngfmP8BfSSirp0DAAA
