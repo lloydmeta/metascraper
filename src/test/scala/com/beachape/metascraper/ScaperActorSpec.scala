@@ -7,9 +7,12 @@ import akka.testkit.{TestActorRef, TestKit, ImplicitSender}
 import akka.actor.ActorSystem
 import scala.io.Source
 import org.jsoup.Jsoup
-import com.beachape.metascraper.Messages.ScrapeUrl
+import com.beachape.metascraper.Messages.{ScrapedData, ScrapeUrl}
 import com.beachape.support.Betamax
 import co.freeside.betamax.TapeMode
+import dispatch._, Defaults._
+import akka.util.Timeout
+import scala.concurrent.duration._
 
 class ScraperActorSpec extends TestKit(ActorSystem("testSystem"))
   with FunSpec
@@ -33,12 +36,19 @@ class ScraperActorSpec extends TestKit(ActorSystem("testSystem"))
   lazy val withOnlyPTag = Source.fromURL(getClass.getResource("/withOnlyPTag.html"))
   lazy val withOnlyPTagDoc = Jsoup.parse(withOnlyPTag.mkString)
 
-  describe("#getDocument") {
+  describe("#getStringFromUrl") {
 
     // Make sure to use a trailing slash at the end .. https://github.com/robfletcher/betamax/issues/61
-    it("should return a document at the requested URL for a normal URL that does not redirect") _ using betamax("test-beachape.com", Some(TapeMode.READ_ONLY)) {
-      val doc = scraperActor.getDocument(ScrapeUrl("http://www.beachape.com/about/"))
-      doc.baseUri() should be ("http://www.beachape.com/about/")
+    it("should return a string of the HTML at that page") _ using betamax("test-beachape.com", Some(TapeMode.READ_ONLY)) {
+      val simpleDispatchResult = Http(url("http://www.beachape.com/about/") OK as.String)
+      val futureEither = scraperActor.getStringFromUrl(ScrapeUrl("http://www.beachape.com/about/"))
+      for{
+        either <- futureEither
+        returnedString <- either.right
+      }{
+        either should be('right)
+        returnedString should be(simpleDispatchResult())
+      }
     }
 
   }
@@ -244,6 +254,58 @@ class ScraperActorSpec extends TestKit(ActorSystem("testSystem"))
         scrappedData.imageUrls should be('empty)
       }
 
+    }
+
+  }
+
+  describe("integration testing by sending ScrapeUrl messages") {
+
+    it ("should return proper data for a non-redirecting URL") _ using betamax("test-beachape.com", Some(TapeMode.READ_ONLY)) {
+      scraperActorRef ! ScrapeUrl("http://www.beachape.com/about/")
+      val response = receiveOne(30 seconds).asInstanceOf[Either[Throwable, ScrapedData]]
+      response should be('right)
+      val Right(scrapedData) = response
+      scrapedData.title should be("About me - BeachApe.")
+      scrapedData.description should be("About Me Sep 5th, 2013 General stuff My name is Lloyd Chan (online, my handles are lloydmeta or meta_Lloyd) and I currently live in Tokyo, Japan. I …")
+      scrapedData.url should be("http://www.beachape.com/about/")
+      scrapedData.mainImageUrl should be('empty)
+      scrapedData.imageUrls should be('empty)
+    }
+
+    it ("should return proper data for a redirecting URL") _ using betamax("test-youtu.be-redirecting", Some(TapeMode.READ_ONLY)) {
+      scraperActorRef ! ScrapeUrl("http://youtu.be/G8CeP15EAS8/")
+      val response = receiveOne(30 seconds).asInstanceOf[Either[Throwable, ScrapedData]]
+      response should be('right)
+      val Right(scrapedData) = response
+      scrapedData.title should be("未来のライター Jii！Jii！Jii！")
+      scrapedData.description should be("未来のライター【Jii】のテーマソング！ 詳細はこちら→http://jii-lighter.com/ USB充電式電熱線ライター【Jii】はガス不要！風に強い！USB充電で繰り返し使える！安心・安全で環境に優しい！")
+      scrapedData.url should be("http://www.youtube.com/watch?v=G8CeP15EAS8")
+      scrapedData.mainImageUrl should be("http://i1.ytimg.com/vi/G8CeP15EAS8/hqdefault.jpg?feature=og")
+      scrapedData.imageUrls should contain("http://i1.ytimg.com/vi/G8CeP15EAS8/hqdefault.jpg?feature=og")
+    }
+
+    it("should return Left for an invalid URL") {
+      scraperActorRef ! ScrapeUrl("omgwtfbbq")
+      val response = receiveOne(30 seconds).asInstanceOf[Either[Throwable, ScrapedData]]
+      response should be('left)
+    }
+
+    it ("should return Left for a broken URL") _ using betamax("test-beachape.com-broken", Some(TapeMode.READ_ONLY)) {
+      scraperActorRef ! ScrapeUrl("http://beachape.com/asdfadgadskgjhagkjas/")
+      val response = receiveOne(30 seconds).asInstanceOf[Either[Throwable, ScrapedData]]
+      response should be('left)
+    }
+
+    it ("should return proper mostly Empty data for a URL that does not point to HTML") _ using betamax("test-beachape.com-non-HTML", Some(TapeMode.READ_ONLY)) {
+      scraperActorRef ! ScrapeUrl("http://www.beachape.com/downloads/code/scala/schwatcher_example.scala/")
+      val response = receiveOne(30 seconds).asInstanceOf[Either[Throwable, ScrapedData]]
+      response should be('right)
+      val Right(scrapedData) = response
+      scrapedData.title should be('empty)
+      scrapedData.description should be('empty)
+      scrapedData.url should be("http://www.beachape.com/downloads/code/scala/schwatcher_example.scala/")
+      scrapedData.mainImageUrl should be('empty)
+      scrapedData.imageUrls should be('empty)
     }
 
   }

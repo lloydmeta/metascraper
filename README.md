@@ -9,7 +9,7 @@ Tested against Scala 2.10.x, OpenJDK 6 and 7, and Oracle JDK 7.
 Add the following to your `build.sbt`
 
 ```scala
-libraryDependencies += "com.beachape.metascraper" %% "metascraper" % "0.0.7"
+libraryDependencies += "com.beachape.metascraper" %% "metascraper" % "0.1.1"
 ```
 
 If the above does not work because it cannot be resolved, its likely because it hasn't been synced to Maven central yet.
@@ -18,7 +18,7 @@ In that case, download a SNAPSHOT release of the same version by adding this to 
 ```
 resolvers += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
 
-libraryDependencies += "com.beachape.metascraper" %% "metascraper" % "0.0.7-SNAPSHOT"
+libraryDependencies += "com.beachape.metascraper" %% "metascraper" % "0.1.1-SNAPSHOT"
 ```
 
 ## Example usage
@@ -42,9 +42,9 @@ for {
   future <- ask(scraperActor, ScrapeUrl("https://bbc.co.uk")).mapTo[Either[FailedToScrapeUrl,ScrapedData]]
 } {
   future match {
-    case Left(failed) => {
+    case Left(throwable) => {
       println("Failed: ")
-      println(failed.message)
+      println(throwable.getMessage)
     }
     case Right(data) => {
       println("Image urls")
