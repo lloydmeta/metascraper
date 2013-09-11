@@ -290,7 +290,7 @@ class ScraperActorSpec extends TestKit(ActorSystem("testSystem"))
       ))
     }
 
-    it ("should return Left for a broken URL") _ using betamax("test-beachape.com-broken", Some(TapeMode.READ_WRITE)) {
+    it ("should return Left for a broken URL") _ using betamax("test-beachape.com-broken", Some(TapeMode.READ_ONLY)) {
       scraperActorRef ! ScrapeUrl("http://beachape.com/asdfadgadskgjhagkjas/")
       val response = receiveOne(30 seconds).asInstanceOf[Either[Throwable, ScrapedData]]
       response should be('left)
