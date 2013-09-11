@@ -1,6 +1,6 @@
 name := "metascraper"
 
-version := "0.1.0"
+version := "0.1.1"
 
 scalaVersion := "2.10.2"
 
@@ -17,6 +17,7 @@ libraryDependencies ++= Seq(
   "co.freeside" % "betamax" % "1.1.2" % "test",
   "com.typesafe.akka" %% "akka-agent" % "2.2.1",
   "net.databinder.dispatch" %% "dispatch-core" % "0.11.0",
+  "commons-validator" % "commons-validator" % "1.4.0",
   "com.typesafe" %% "scalalogging-slf4j" % "1.0.1",
   "org.jsoup" % "jsoup" % "1.7.2",
   "org.slf4j" % "slf4j-api" % "1.7.1",

@@ -8,6 +8,8 @@ import org.jsoup.nodes.Document
 import scala.collection.JavaConverters._
 import scala.concurrent.Future
 import dispatch._
+import org.apache.commons.validator.routines.UrlValidator
+
 
 /**
  * Companion object for instantiating ScaperActors
@@ -32,15 +34,22 @@ class ScraperActor extends Actor with Logging {
 
   import context.dispatcher
 
+  lazy val validSchemas = Seq("http", "https")
+  lazy val urlValidator = new UrlValidator(validSchemas.toArray)
+
   def receive = {
 
     case message: ScrapeUrl => {
-      val zender = sender
-      for (futureEither <- getStringFromUrl(message)) {
-        futureEither match {
-          case Right(responseString) => self ! ScrapeString(responseString, message.url, zender)
-          case Left(throwable) => logAndForwardErrorAsLeft(throwable, zender)
+      if (urlValidator.isValid(message.url)) {
+        val zender = sender
+        for (futureEither <- getStringFromUrl(message)) {
+          futureEither match {
+            case Right(responseString) => self ! ScrapeString(responseString, message.url, zender)
+            case Left(throwable) => logAndForwardErrorAsLeft(throwable, zender)
+          }
         }
+      } else {
+        sender ! Left(new Throwable(s"Invalid url ${message.url}"))
       }
     }
 
@@ -105,7 +114,7 @@ class ScraperActor extends Actor with Logging {
    * @return String url
    */
   def extractUrl(doc: Document, accessedUrl: String): String = {
-    if (!doc.select("meta[property=og:url]").attr("content").isEmpty()) {
+    if (!doc.select("meta[property=og:url]").attr("content").isEmpty) {
       doc.select("meta[property=og:url]").attr("content")
     } else {
       accessedUrl
@@ -121,7 +130,7 @@ class ScraperActor extends Actor with Logging {
    * @return String title
    */
   def extractTitle(doc: Document): String = {
-    if (!doc.select("meta[property=og:title]").attr("content").isEmpty()) {
+    if (!doc.select("meta[property=og:title]").attr("content").isEmpty) {
       doc.select("meta[property=og:title]").attr("content")
     } else {
       doc.title()
@@ -176,7 +185,7 @@ class ScraperActor extends Actor with Logging {
    * @return Seq[String] collection of image urls
    */
   def extractImages(doc: Document, takeFirst: Int = 5): Seq[String] = {
-    if (!doc.select("meta[property=og:image]").attr("content").isEmpty()) {
+    if (!doc.select("meta[property=og:image]").attr("content").isEmpty) {
       val ogImageSrcs = doc.select("meta[property=og:image]").iterator().asScala.take(takeFirst).toSeq.map(_.attr("abs:content"))
       if (ogImageSrcs.size < takeFirst)
         ogImageSrcs ++ doc.select("img[src]").iterator().asScala.take(takeFirst - ogImageSrcs.size).toSeq.map(_.attr("abs:src"))
