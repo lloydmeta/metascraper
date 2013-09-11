@@ -9,12 +9,34 @@ import scala.collection.JavaConverters._
 import scala.concurrent.Future
 import dispatch._
 import org.apache.commons.validator.routines.UrlValidator
+import java.util.concurrent.{ExecutorService, Executors}
+import com.ning.http.client.{AsyncHttpClientConfig, AsyncHttpClient}
 
 
 /**
  * Companion object for instantiating ScaperActors
  */
 object ScraperActor {
+
+  lazy val maxConnections = 30
+  lazy val connectionPooling = true
+  lazy val connectionTimeoutInMs = 10000
+  lazy val requestTimeoutInMs = 20000
+  lazy val compressionEnabled = true
+  lazy val httpExecutorService: ExecutorService = Executors.newFixedThreadPool(10)
+
+  lazy val config = new AsyncHttpClientConfig.Builder()
+    .setExecutorService(httpExecutorService)
+    .setMaximumConnectionsPerHost(maxConnections)
+    .setAllowPoolingConnection(true)
+    .setAllowSslConnectionPool(true)
+    .setConnectionTimeoutInMs(connectionTimeoutInMs)
+    .setRequestTimeoutInMs(requestTimeoutInMs)
+    .setCompressionEnabled(compressionEnabled)
+    .setFollowRedirects(true).build
+
+  lazy val asyncHttpClient = new AsyncHttpClient(config)
+  lazy val http = new Http(asyncHttpClient)
 
   /**
    * Factory method for the params required to instantiate a MonitorActor
@@ -80,7 +102,7 @@ class ScraperActor extends Actor with Logging {
       "User-Agent" -> Seq(message.userAgent),
       "Accept-Language" -> Seq(message.acceptLanguageCode))
     val request = url(message.url).setHeaders(requestHeaders)
-    val resp = Http.configure(_ setFollowRedirects true)(request OK as.String).either
+    val resp = ScraperActor.http(request OK as.String).either
     for (throwable <- resp.left) yield throwable
   }
 
