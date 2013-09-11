@@ -281,13 +281,7 @@ class ScraperActorSpec extends TestKit(ActorSystem("testSystem"))
       scrapedData.description should be("未来のライター【Jii】のテーマソング！ 詳細はこちら→http://jii-lighter.com/ USB充電式電熱線ライター【Jii】はガス不要！風に強い！USB充電で繰り返し使える！安心・安全で環境に優しい！")
       scrapedData.url should be("http://www.youtube.com/watch?v=G8CeP15EAS8")
       scrapedData.mainImageUrl should be("http://i1.ytimg.com/vi/G8CeP15EAS8/hqdefault.jpg?feature=og")
-      scrapedData.imageUrls should be(Seq(
-        "http://i1.ytimg.com/vi/G8CeP15EAS8/hqdefault.jpg?feature=og",
-        "http://s.ytimg.com/yts/img/pixel-vfl3z5WfW.gif",
-        "http://s.ytimg.com/yts/img/pixel-vfl3z5WfW.gif",
-        "http://s.ytimg.com/yts/img/pixel-vfl3z5WfW.gif",
-        "http://s.ytimg.com/yts/img/pixel-vfl3z5WfW.gif"
-      ))
+      scrapedData.imageUrls should contain("http://i1.ytimg.com/vi/G8CeP15EAS8/hqdefault.jpg?feature=og")
     }
 
     it ("should return Left for a broken URL") _ using betamax("test-beachape.com-broken", Some(TapeMode.READ_ONLY)) {
@@ -296,7 +290,7 @@ class ScraperActorSpec extends TestKit(ActorSystem("testSystem"))
       response should be('left)
     }
 
-    it ("should return proper mostly Empty data for a URL that does not point to HTML") _ using betamax("test-beachape.com-non-HTML", Some(TapeMode.READ_WRITE)) {
+    it ("should return proper mostly Empty data for a URL that does not point to HTML") _ using betamax("test-beachape.com-non-HTML", Some(TapeMode.READ_ONLY)) {
       scraperActorRef ! ScrapeUrl("http://www.beachape.com/downloads/code/scala/schwatcher_example.scala/")
       val response = receiveOne(30 seconds).asInstanceOf[Either[Throwable, ScrapedData]]
       response should be('right)
