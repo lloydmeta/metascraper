@@ -1,14 +1,13 @@
 package com.beachape.metascraper
 
 import com.beachape.metascraper.Messages._
-import akka.actor.{Actor, Props}
+import akka.actor.{ActorRef, Actor, Props}
 import com.typesafe.scalalogging.slf4j.Logging
-import java.io.IOException
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import scala.collection.JavaConverters._
-import scala.annotation.tailrec
-import java.net.URL
+import scala.concurrent.Future
+import dispatch._
 
 /**
  * Companion object for instantiating ScaperActors
@@ -31,25 +30,27 @@ object ScraperActor {
  */
 class ScraperActor extends Actor with Logging {
 
+  import context.dispatcher
+
   def receive = {
 
     case message: ScrapeUrl => {
+      val zender = sender
+      for (futureEither <- getStringFromUrl(message)) {
+        futureEither match {
+          case Right(responseString) => self ! ScrapeString(responseString, message.url, zender)
+          case Left(throwable) => logAndForwardErrorAsLeft(throwable, zender)
+        }
+      }
+    }
+
+    case message: ScrapeString => {
       try {
-        val document = getDocument(message)
-        val scrapedData = extractScrapedData(document, message.url)
-        logger.info(s"Scraped data: ${scrapedData}")
-        sender ! Right(scrapedData)
+        val document = Jsoup.parse(message.string, message.url)
+        val extractedData = extractScrapedData(document, message.url)
+        message.zender ! Right(extractedData)
       } catch {
-        case ioe: IOException => {
-          val errorMessage = s"Failed to retrieve page at url: ${message.url}"
-          logger.error(errorMessage)
-          sender ! Left(FailedToScrapeUrl(errorMessage))
-        }
-        case e: Exception => {
-          val errorMessage = e.getMessage
-          logger.error(errorMessage)
-          sender ! Left(FailedToScrapeUrl(errorMessage))
-        }
+        case e: Exception => logAndForwardErrorAsLeft(e, message.zender)
       }
     }
 
@@ -57,19 +58,21 @@ class ScraperActor extends Actor with Logging {
   }
 
   /**
-   * Returns a Jsoup Document
+   * Returns a Future[Either[Throwable, String]] where the string is the response
+   * string
    *
-   * Follows redirects in location headers
+   * Does an HTTP Follows redirects in location headers.
    *
    * @param message ScrapeUrl message
-   * @return document Jsoup document
+   * @return document Future[Document]
    */
-  def getDocument(message: ScrapeUrl): Document = {
-    Jsoup.connect(message.url).
-      followRedirects(true).
-      userAgent(message.userAgent).
-      header("Accept-Language", message.acceptLanguageCode).
-      get()
+  def getStringFromUrl(message: ScrapeUrl): Future[Either[Throwable, String]] = {
+    val requestHeaders = Map(
+      "User-Agent" -> Seq(message.userAgent),
+      "Accept-Language" -> Seq(message.acceptLanguageCode))
+    val request = url(message.url).setHeaders(requestHeaders)
+    val resp = Http.configure(_ setFollowRedirects true)(request OK as.String).either
+    for (throwable <- resp.left) yield throwable
   }
 
   /**
@@ -182,6 +185,17 @@ class ScraperActor extends Actor with Logging {
     } else {
       doc.select("img[src]").iterator().asScala.take(takeFirst).toSeq.map(_.attr("abs:src"))
     }
+  }
+
+  /**
+   * Helper function that logs an error and forwards the throwable
+   *
+   * @param throwable Throwable
+   * @param sendToRef Actor to send the message to
+   */
+  def logAndForwardErrorAsLeft(throwable: Throwable, sendToRef: ActorRef) {
+    logger.error(throwable.getMessage)
+    sendToRef ! Left(throwable)
   }
 
 }
