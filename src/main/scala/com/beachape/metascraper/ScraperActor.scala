@@ -73,6 +73,10 @@ class ScraperActor(
   lazy val asyncHttpClient = new AsyncHttpClient(config)
   lazy val httpClient = new Http(asyncHttpClient)
 
+  override def postStop() {
+    httpExecutorService.shutdown()
+  }
+
   def receive = {
 
     case message: ScrapeUrl => {
