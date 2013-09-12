@@ -33,7 +33,8 @@ object ScraperActor {
             requestTimeoutInMs: Int = 15000) =
     Props(
       classOf[ScraperActor],
-      httpExecutorThreads, maxConnectionsPerHost,
+      httpExecutorThreads,
+      maxConnectionsPerHost,
       connectionTimeoutInMs,
       requestTimeoutInMs)
 }
@@ -52,6 +53,7 @@ class ScraperActor(
   extends Actor with Logging {
 
   import context.dispatcher
+
   lazy val compressionEnabled = true
 
   // Validator
