@@ -59,21 +59,23 @@ class ScraperActor(
   lazy val urlValidator = new UrlValidator(validSchemas.toArray)
 
   // Http client
+  lazy val followRedirects = true
   lazy val connectionPooling = true
   lazy val httpExecutorService: ExecutorService = Executors.newFixedThreadPool(httpExecutorThreads)
   lazy val config = new AsyncHttpClientConfig.Builder()
     .setExecutorService(httpExecutorService)
     .setMaximumConnectionsPerHost(maxConnectionsPerHost)
-    .setAllowPoolingConnection(true)
-    .setAllowSslConnectionPool(true)
+    .setAllowPoolingConnection(connectionPooling)
+    .setAllowSslConnectionPool(connectionPooling)
     .setConnectionTimeoutInMs(connectionTimeoutInMs)
     .setRequestTimeoutInMs(requestTimeoutInMs)
     .setCompressionEnabled(compressionEnabled)
-    .setFollowRedirects(true).build
+    .setFollowRedirects(followRedirects).build
   lazy val asyncHttpClient = new AsyncHttpClient(config)
   lazy val httpClient = new Http(asyncHttpClient)
 
   override def postStop() {
+    httpClient.shutdown()
     httpExecutorService.shutdown()
   }
 
