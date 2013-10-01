@@ -235,7 +235,11 @@ class ScraperActor(
         ogImageSrcs ++ doc.select("img[src]").iterator().asScala.take(takeFirst - ogImageSrcs.size).toSeq.map(_.attr("abs:src"))
       else
         ogImageSrcs
-    } else {
+    } else if (!doc.select("link[rel=image_src]").attr("href").isEmpty) {
+      val imageRelSrc = doc.select("link[rel=image_src]").attr("abs:href")
+      imageRelSrc +: doc.select("img[src]").iterator().asScala.take(takeFirst - 1).toSeq.map(_.attr("abs:src"))
+    }
+    else {
       doc.select("img[src]").iterator().asScala.take(takeFirst).toSeq.map(_.attr("abs:src"))
     }
   }
