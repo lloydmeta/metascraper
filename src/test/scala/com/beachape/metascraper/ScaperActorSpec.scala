@@ -35,6 +35,9 @@ class ScraperActorSpec extends TestKit(ActorSystem("testSystem"))
   lazy val withOnlyPTag = Source.fromURL(getClass.getResource("/withOnlyPTag.html"))
   lazy val withOnlyPTagDoc = Jsoup.parse(withOnlyPTag.mkString)
 
+  lazy val withOnlyImageRel = Source.fromURL(getClass.getResource("/withOnlyImageRel.html"))
+  lazy val withOnlyImageRelDoc = Jsoup.parse(withOnlyImageRel.mkString)
+
   describe("#getStringFromUrl") {
 
     // Make sure to use a trailing slash at the end .. https://github.com/robfletcher/betamax/issues/61
@@ -162,6 +165,16 @@ class ScraperActorSpec extends TestKit(ActorSystem("testSystem"))
 
     }
 
+    describe("for a page with an image rel tag") {
+
+      it("should return a sequence with the image rel source url") {
+        scraperActor.extractImages(withOnlyImageRelDoc) should be(
+          Seq(
+            "http://lala.com/theMainImage.png"))
+      }
+
+    }
+
     describe("for a page with neither og:image nor img tags") {
 
       it("should return an empty sequence") {
@@ -281,6 +294,18 @@ class ScraperActorSpec extends TestKit(ActorSystem("testSystem"))
       scrapedData.url should be("http://www.youtube.com/watch?v=G8CeP15EAS8")
       scrapedData.mainImageUrl should be("http://i1.ytimg.com/vi/G8CeP15EAS8/hqdefault.jpg?feature=og")
       scrapedData.imageUrls should contain("http://i1.ytimg.com/vi/G8CeP15EAS8/hqdefault.jpg?feature=og")
+    }
+
+    it ("should return proper data for a URL with a page that does not contain OG links") _ using betamax("test-imgur", Some(TapeMode.READ_ONLY)) {
+      scraperActorRef ! ScrapeUrl("http://imgur.com/gallery/ndVA6qs")
+      val response = receiveOne(30 seconds).asInstanceOf[Either[Throwable, ScrapedData]]
+      response should be('right)
+      val Right(scrapedData) = response
+      scrapedData.title should be("What I imagine entering the job market in the 90s must have been like... - Imgur")
+      scrapedData.description should be("Imgur is home to the web's most popular image content, curated in real time by a dedicated community through commenting, voting and sharing.")
+      scrapedData.url should be("http://imgur.com/gallery/ndVA6qs")
+      scrapedData.mainImageUrl should be("http://i.imgur.com/ndVA6qs.png")
+      scrapedData.imageUrls should contain("http://i.imgur.com/ndVA6qs.png")
     }
 
     it("should return Left for an invalid URL") {
