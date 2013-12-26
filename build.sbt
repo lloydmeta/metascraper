@@ -18,17 +18,7 @@ libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-actor" % "2.2.3",
   "net.databinder.dispatch" %% "dispatch-core" % "0.11.0",
   "commons-validator" % "commons-validator" % "1.4.0",
-  "com.typesafe" %% "scalalogging-slf4j" % "1.0.1",
-  "org.jsoup" % "jsoup" % "1.7.2",
-  "org.slf4j" % "slf4j-api" % "1.7.1",
-  "ch.qos.logback" % "logback-classic" % "1.0.3"
-)
-
-testOptions in Test += Tests.Setup(classLoader =>
-  classLoader
-    .loadClass("org.slf4j.LoggerFactory")
-    .getMethod("getLogger", classLoader.loadClass("java.lang.String"))
-    .invoke(null, "ROOT")
+  "org.jsoup" % "jsoup" % "1.7.2"
 )
 
 publishTo <<= version { v: String =>
