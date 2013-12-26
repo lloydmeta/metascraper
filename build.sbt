@@ -12,10 +12,10 @@ resolvers += "Typesafe Repository" at "http://repo.typesafe.com/typesafe/release
 
 libraryDependencies ++= Seq(
   "org.scalatest" %% "scalatest" % "1.9.1" % "test",
-  "com.typesafe.akka" %% "akka-testkit" % "2.2.1" % "test",
+  "com.typesafe.akka" %% "akka-testkit" % "2.2.3" % "test",
   "org.codehaus.groovy" % "groovy-all" % "1.8.8" % "test",
   "co.freeside" % "betamax" % "1.1.2" % "test",
-  "com.typesafe.akka" %% "akka-agent" % "2.2.1",
+  "com.typesafe.akka" %% "akka-actor" % "2.2.3",
   "net.databinder.dispatch" %% "dispatch-core" % "0.11.0",
   "commons-validator" % "commons-validator" % "1.4.0",
   "com.typesafe" %% "scalalogging-slf4j" % "1.0.1",
