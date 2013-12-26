@@ -292,8 +292,8 @@ class ScraperActorSpec extends TestKit(ActorSystem("testSystem"))
       scrapedData.title should be("未来のライター Jii！Jii！Jii！")
       scrapedData.description should be("未来のライター【Jii】のテーマソング！ 詳細はこちら→http://jii-lighter.com/ USB充電式電熱線ライター【Jii】はガス不要！風に強い！USB充電で繰り返し使える！安心・安全で環境に優しい！")
       scrapedData.url should be("http://www.youtube.com/watch?v=G8CeP15EAS8")
-      scrapedData.mainImageUrl should be("http://i1.ytimg.com/vi/G8CeP15EAS8/hqdefault.jpg?feature=og")
-      scrapedData.imageUrls should contain("http://i1.ytimg.com/vi/G8CeP15EAS8/hqdefault.jpg?feature=og")
+      scrapedData.mainImageUrl should be("http://i1.ytimg.com/vi/G8CeP15EAS8/hqdefault.jpg")
+      scrapedData.imageUrls should contain("http://i1.ytimg.com/vi/G8CeP15EAS8/hqdefault.jpg")
     }
 
     it ("should return proper data for a URL with a page that does not contain OG links") _ using betamax("test-imgur", Some(TapeMode.READ_ONLY)) {
