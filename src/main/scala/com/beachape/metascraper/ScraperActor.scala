@@ -1,8 +1,7 @@
 package com.beachape.metascraper
 
 import com.beachape.metascraper.Messages._
-import akka.actor.{ActorRef, Actor, Props}
-import com.typesafe.scalalogging.slf4j.Logging
+import akka.actor.{ActorLogging, ActorRef, Actor, Props}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import scala.collection.JavaConverters._
@@ -50,7 +49,7 @@ class ScraperActor(
                     maxConnectionsPerHost: Int = 30,
                     connectionTimeoutInMs: Int = 10000,
                     requestTimeoutInMs: Int = 15000)
-  extends Actor with Logging {
+  extends Actor with ActorLogging {
 
   import context.dispatcher
 
@@ -107,7 +106,7 @@ class ScraperActor(
       }
     }
 
-    case _ => logger.error("Scraper Actor received an unexpected message :( !")
+    case _ => log.error("Scraper Actor received an unexpected message :( !")
   }
 
   /**
@@ -251,7 +250,7 @@ class ScraperActor(
    * @param sendToRef Actor to send the message to
    */
   def logAndForwardErrorAsLeft(throwable: Throwable, sendToRef: ActorRef) {
-    logger.error(throwable.getMessage)
+    log.error(throwable.getMessage)
     sendToRef ! Left(throwable)
   }
 
