@@ -1,6 +1,7 @@
 package com.beachape.metascraper
 
 import com.beachape.metascraper.Messages._
+import com.beachape.metascraper.RichString._
 import akka.actor.{ActorLogging, ActorRef, Actor, Props}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -83,16 +84,20 @@ class ScraperActor(
   def receive = {
 
     case message: ScrapeUrl => {
-      if (urlValidator.isValid(message.url)) {
-        val zender = sender
-        for (futureEither <- getStringFromUrl(message)) {
-          futureEither match {
-            case Right(responseString) => self ! ScrapeString(responseString, message.url, zender)
-            case Left(throwable) => logAndForwardErrorAsLeft(throwable, zender)
+      message match {
+        case ScrapeUrl(url, _, _) if !urlValidator.isValid(url) =>
+          sender ! Left(new Throwable(s"Invalid url ${message.url}"))
+        case ScrapeUrl(url, _, _) if url.hasImageExtension =>
+          sender ! Right(ScrapedData(url, url, url, url, Seq(url)))
+        case _ => {
+          val zender = sender
+          for (futureEither <- getStringFromUrl(message)) {
+            futureEither match {
+              case Right(responseString) => self ! ScrapeString(responseString, message.url, zender)
+              case Left(throwable) => logAndForwardErrorAsLeft(throwable, zender)
+            }
           }
         }
-      } else {
-        sender ! Left(new Throwable(s"Invalid url ${message.url}"))
       }
     }
 
