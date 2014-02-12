@@ -332,6 +332,19 @@ class ScraperActorSpec extends TestKit(ActorSystem("testSystem"))
       scrapedData.imageUrls should be('empty)
     }
 
+    it ("should return the URL if it ends in any of the accepted image extenions") {
+      val imgUrl = "http://nonexistentsite.com/somethingnonexistent.jpg"
+      scraperActorRef ! ScrapeUrl(imgUrl)
+      val response = receiveOne(30 seconds).asInstanceOf[Either[Throwable, ScrapedData]]
+      response should be('right)
+      val Right(scrapedData) = response
+      scrapedData.title should be(imgUrl)
+      scrapedData.description should be(imgUrl)
+      scrapedData.url should be(imgUrl)
+      scrapedData.mainImageUrl should be(imgUrl)
+      scrapedData.imageUrls should be(Seq(imgUrl))
+    }
+
   }
 
 }
