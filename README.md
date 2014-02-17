@@ -64,9 +64,11 @@ for {
 */
 ```
 
-## Example application
+## Example applications
 
-[Metascraper-service](https://github.com/lloydmeta/metascraper-service): a RESTful Play2 service that uses this library to scrape data from a requested URL, taking advantage of the tight integration that Play2 has with Akka.
+1. [Metascraper-service](https://github.com/lloydmeta/metascraper-service): a RESTful Play2 service that uses this library to scrape data from a requested URL, taking advantage of the tight integration that Play2 has with Akka.
+
+2. [Metascraper-scalatra](https://github.com/lloydmeta/metascraper-scalatra): same as 1. but built on Scalatra, which is more light-weight and Servlet 3.0 compliant.
 
 ## Licence
 
