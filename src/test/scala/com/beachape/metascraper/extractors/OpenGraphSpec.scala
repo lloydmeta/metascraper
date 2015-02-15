@@ -1,5 +1,6 @@
 package com.beachape.metascraper.extractors
 
+import com.beachape.metascraper.extractors.html.OpenGraph
 import org.scalatest._
 
 /**
@@ -14,7 +15,7 @@ class OpenGraphSpec extends FunSpec with Matchers with DocsSupport {
     describe("for a page without og:url") {
 
       it("should return None") {
-        subject.extractUrl(withoutOgTagsDoc) shouldBe None
+        OpenGraph(withoutOgTagsDoc).extractUrl shouldBe None
       }
 
     }
@@ -22,7 +23,7 @@ class OpenGraphSpec extends FunSpec with Matchers with DocsSupport {
     describe("for a page with a meta og:url tag") {
 
       it("should return the content of the meta og:url tag") {
-        subject.extractUrl(withOgTagsDoc) shouldBe Some("https://ogtagsthingy.com/page.html")
+        OpenGraph(withOgTagsDoc).extractUrl shouldBe Some("https://ogtagsthingy.com/page.html")
       }
 
     }
@@ -33,7 +34,7 @@ class OpenGraphSpec extends FunSpec with Matchers with DocsSupport {
     describe("for a page without og:title but with a title tag") {
 
       it("should return None") {
-        subject.extractTitle(withoutOgTagsDoc) shouldBe None
+        OpenGraph(withoutOgTagsDoc).extractTitle shouldBe None
       }
 
     }
@@ -41,7 +42,7 @@ class OpenGraphSpec extends FunSpec with Matchers with DocsSupport {
     describe("for a page with og:title") {
 
       it("should return the contents of the og:title tag") {
-        subject.extractTitle(withOgTagsDoc) shouldBe Some("Title in Open Graph Tag")
+        OpenGraph(withOgTagsDoc).extractTitle shouldBe Some("Title in Open Graph Tag")
       }
 
     }
@@ -52,7 +53,7 @@ class OpenGraphSpec extends FunSpec with Matchers with DocsSupport {
     describe("for a page without og:description") {
 
       it("should return None") {
-        subject.extractDescription(withoutOgTagsDoc) shouldBe None
+        OpenGraph(withoutOgTagsDoc).extractDescription shouldBe None
       }
 
     }
@@ -60,7 +61,7 @@ class OpenGraphSpec extends FunSpec with Matchers with DocsSupport {
     describe("for a page with a og:description tag") {
 
       it("should return the contents of the og:description tag") {
-        subject.extractDescription(withOgTagsDoc) shouldBe Some("Description inside og:description tag")
+        OpenGraph(withOgTagsDoc).extractDescription shouldBe Some("Description inside og:description tag")
       }
 
     }
@@ -71,7 +72,7 @@ class OpenGraphSpec extends FunSpec with Matchers with DocsSupport {
     describe("for a page without og:image tags") {
 
       it("should return an empty sequence") {
-        subject.extractImages(withoutOgTagsDoc) shouldBe 'empty
+        OpenGraph(withoutOgTagsDoc).extractImages shouldBe 'empty
       }
 
     }
@@ -79,7 +80,7 @@ class OpenGraphSpec extends FunSpec with Matchers with DocsSupport {
     describe("for a page with og:image tags") {
 
       it("should return the src contents of 5 pg:image sources") {
-        subject.extractImages(withOgTagsDoc) shouldBe
+        OpenGraph(withOgTagsDoc).extractImages shouldBe
           Seq(
             "http://lala.com/theMainImage.png",
             "http://lolol.com/thing1.gif",
@@ -99,7 +100,7 @@ class OpenGraphSpec extends FunSpec with Matchers with DocsSupport {
     describe("for a page without og:image tags") {
 
       it("should return None") {
-        subject.extractMainImage(withoutOgTagsDoc) shouldBe None
+        OpenGraph(withoutOgTagsDoc).extractMainImage shouldBe None
       }
 
     }
@@ -107,7 +108,7 @@ class OpenGraphSpec extends FunSpec with Matchers with DocsSupport {
     describe("for a page with og:image tags") {
 
       it("should return the src contents of the first og:image tag") {
-        subject.extractMainImage(withOgTagsDoc) shouldBe Some("http://lala.com/theMainImage.png")
+        OpenGraph(withOgTagsDoc).extractMainImage shouldBe Some("http://lala.com/theMainImage.png")
       }
 
     }

@@ -1,9 +1,9 @@
-package com.beachape.metascraper.extractors
+package com.beachape.metascraper.extractors.html
 
 import org.jsoup.nodes.Document
 
-import scala.util.Try
 import scala.collection.JavaConverters._
+import scala.util.Try
 
 /**
  * Created by Lloyd on 2/15/15.
@@ -12,22 +12,21 @@ import scala.collection.JavaConverters._
 /**
  * Schema for just normal HTML, whatever that means
  */
-object NormalPage extends Schema {
+case class NormalPage(doc: Document) extends HtmlSchema {
 
-  def extractUrl(doc: Document): Option[String] = Try(doc.baseUri()).toOption.filter(_.nonEmpty)
+  def extractUrl: Option[String] = Try(doc.baseUri()).toOption.filter(_.nonEmpty)
 
-  def extractTitle(doc: Document): Option[String] = Try(doc.title()).toOption.filter(_.nonEmpty)
+  def extractTitle: Option[String] = Try(doc.title()).toOption.filter(_.nonEmpty)
 
-  def extractImages(doc: Document): Seq[String] = Try {
+  lazy val extractImages: Seq[String] = Try {
     val imgSrc = doc.select("link[rel=image_src]").attr("abs:href")
-    if (imgSrc.nonEmpty) {
+    if (imgSrc.nonEmpty)
       imgSrc +: doc.select("img[src]").iterator().asScala.toSeq.map(_.attr("abs:src"))
-    } else {
+    else
       doc.select("img[src]").iterator().asScala.toSeq.map(_.attr("abs:src"))
-    }
   }.getOrElse(Nil)
 
-  def extractDescription(doc: Document): Option[String] = Try {
+  def extractDescription: Option[String] = Try {
     val metaDesc = doc.select("meta[name=description]").attr("content")
     if (metaDesc.nonEmpty) {
       metaDesc
@@ -40,5 +39,5 @@ object NormalPage extends Schema {
     }
   }.toOption.filter(_.nonEmpty)
 
-  def extractMainImage(doc: Document): Option[String] = extractImages(doc).headOption
+  def extractMainImage: Option[String] = extractImages.headOption
 }

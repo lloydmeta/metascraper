@@ -81,8 +81,29 @@ for {
 
 ### Custom scraping schema
 
-You can choose to customise scraping by implementing `Schema` and passing it as one of the schemas used to scrape a your
-URL in the `ScrapeUrl` message.
+You can customise scraping by implementing `SchemaFactory` and `Schema`.
+
+- A `SchemaFactory` needs to implement a method that takes a `Response` from AsyncHttpClient and returns a list of `Schema`
+- A `Schema` is what is used to extract data from the response
+
+This allows you to freely customise the way this lib extracts data from HTTP endpoints, for example as listed on [Schema.org](https://schema.org/).
+
+That said, if all you want to do is implement a custom HTML data scraper, you just need to implement `HtmlSchema`
+and pass it along to a `ScrapeUrl` message inside `HtmlSchemas`, as follows:
+
+```scala
+
+case class CustomHtmlSchema(doc: Document) extends HtmlSchema {
+ // Implementations
+}
+
+val scraper = new Scraper(httpClient = Http, urlSchemas = Seq("http", "https"))
+val scrapeMessage = ScrapeUrl("https://google.com", schemaFactories = Seq(HtmlSchemas(OpenGraph, CustomHtmlSchema, NormalPage)) )
+val fData = scraper.fetch(scrapeMessage)
+```
+
+In the above case, `HtmlSchemas` is a `SchemaFactory` that creates a Jsoup `Document` and gives it to the `Schema`s that
+it generates. That way, only one String to Document parse needs to happen.
 
 
 ## Example applications

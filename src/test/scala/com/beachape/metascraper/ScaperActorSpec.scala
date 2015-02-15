@@ -19,15 +19,15 @@ class ScraperActorSpec extends TestKit(ActorSystem("testSystem"))
   describe("integration testing by sending ScrapeUrl messages") {
 
     it("should return proper data for a non-redirecting URL") {
-      scraperActorRef ! ScrapeUrl("http://www.beachape.com/about/")
+      scraperActorRef ! ScrapeUrl("https://beachape.com/about/")
       val response = receiveOne(30 seconds).asInstanceOf[Either[Throwable, ScrapedData]]
       response should be('right)
       val Right(scrapedData) = response
       scrapedData.title should be("About Me - BeachApe.")
       scrapedData.description should startWith("Sep 5th, 2013 My name is Lloyd Chan")
-      scrapedData.url should be("http://www.beachape.com/about/")
-      scrapedData.mainImageUrl shouldBe "http://www.beachape.com/images/rss.png"
-      scrapedData.imageUrls should contain("http://www.beachape.com/images/rss.png")
+      scrapedData.url should be("https://beachape.com/about/")
+      scrapedData.mainImageUrl shouldBe "https://beachape.com/images/rss.png"
+      scrapedData.imageUrls should contain("https://beachape.com/images/rss.png")
     }
 
     it("should return proper data for a redirecting URL") {
@@ -73,7 +73,7 @@ class ScraperActorSpec extends TestKit(ActorSystem("testSystem"))
       val Right(scrapedData) = response
       scrapedData.title should be('empty)
       scrapedData.description should be('empty)
-      scrapedData.url should be("http://www.beachape.com/downloads/code/scala/schwatcher_example.scala")
+      scrapedData.url should be("https://beachape.com/downloads/code/scala/schwatcher_example.scala")
       scrapedData.mainImageUrl should be('empty)
       scrapedData.imageUrls should be('empty)
     }

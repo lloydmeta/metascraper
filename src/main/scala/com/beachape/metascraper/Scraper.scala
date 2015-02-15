@@ -1,7 +1,8 @@
 package com.beachape.metascraper
 
 import com.beachape.metascraper.Messages.{ ScrapedData, ScrapeUrl }
-import com.beachape.metascraper.extractors.Schema
+import com.beachape.metascraper.extractors.{ SchemaFactory, Schema }
+import com.ning.http.client.Response
 import dispatch._
 import org.apache.commons.validator.routines.UrlValidator
 import org.jsoup.Jsoup
@@ -36,8 +37,8 @@ class Scraper(httpClient: Http, urlSchemas: Seq[String])(implicit ec: ExecutionC
         "User-Agent" -> Seq(message.userAgent),
         "Accept-Language" -> Seq(message.acceptLanguageCode))
       val request = url(messageUrl).setHeaders(requestHeaders)
-      val resp = httpClient(request OK as.String)
-      resp map (s => extractData(s, messageUrl, message.schemas, message.numberOfImages))
+      val resp = httpClient(request)
+      resp map (s => extractData(s, messageUrl, message.schemaFactories, message.numberOfImages))
     }
   }
 
@@ -47,13 +48,13 @@ class Scraper(httpClient: Http, urlSchemas: Seq[String])(implicit ec: ExecutionC
    * The list of [[Schema]] are processed from left to right, meaning the ones to the beginning of the
    * list get precedence over those towards the end
    */
-  def extractData(htmlString: String, url: String, schemaTypes: Seq[Schema], numberOfImages: Int): ScrapedData = {
-    val doc = Jsoup.parse(htmlString, url)
-    val maybeUrl = schemaTypes.foldLeft(None: Option[String]) { (acc, schema) => acc orElse (schema.extractUrl(doc)) }
-    val maybeTitle = schemaTypes.foldLeft(None: Option[String]) { (acc, schema) => acc orElse (schema.extractTitle(doc)) }
-    val maybeDescription = schemaTypes.foldLeft(None: Option[String]) { (acc, schema) => acc orElse (schema.extractDescription(doc)) }
-    val imageUrls = schemaTypes.foldLeft(Seq.empty[String]) { (acc, schema) => acc ++ (schema.extractImages(doc)) }
-    val maybeMainImg = schemaTypes.foldLeft(None: Option[String]) { (acc, schema) => acc orElse (schema.extractMainImage(doc)) }
+  def extractData(resp: Response, url: String, schemaFactories: Seq[SchemaFactory], numberOfImages: Int): ScrapedData = {
+    val schemas = schemaFactories.toStream.flatMap(_.apply(resp)) // Stream in case we have expensive factories
+    val maybeUrl = schemas.foldLeft(None: Option[String]) { (acc, schema) => acc orElse schema.extractUrl }
+    val maybeTitle = schemas.foldLeft(None: Option[String]) { (acc, schema) => acc orElse schema.extractTitle }
+    val maybeDescription = schemas.foldLeft(None: Option[String]) { (acc, schema) => acc orElse schema.extractDescription }
+    val imageUrls = schemas.foldLeft(Seq.empty[String]) { (acc, schema) => acc ++ schema.extractImages }
+    val maybeMainImg = schemas.foldLeft(None: Option[String]) { (acc, schema) => acc orElse schema.extractMainImage }
     ScrapedData(
       url = maybeUrl.getOrElse(url),
       title = maybeTitle.getOrElse(""),
