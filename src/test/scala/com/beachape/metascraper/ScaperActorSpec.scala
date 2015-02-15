@@ -4,10 +4,8 @@ import org.scalatest.BeforeAndAfter
 import org.scalatest._
 import akka.testkit.{ TestActorRef, TestKit, ImplicitSender }
 import akka.actor.ActorSystem
-import scala.io.Source
-import org.jsoup.Jsoup
 import com.beachape.metascraper.Messages.{ ScrapedData, ScrapeUrl }
-import dispatch._, Defaults._
+import dispatch._
 import scala.concurrent.duration._
 
 class ScraperActorSpec extends TestKit(ActorSystem("testSystem"))
@@ -40,7 +38,7 @@ class ScraperActorSpec extends TestKit(ActorSystem("testSystem"))
       scrapedData.title should be("未来のライター Jii！Jii！Jii！")
       scrapedData.description should be("未来のライター【Jii】のテーマソング！ 詳細はこちら→http://jii-lighter.com/ USB充電式電熱線ライター【Jii】はガス不要！風に強い！USB充電で繰り返し使える！安心・安全で環境に優しい！")
       scrapedData.url should be("http://www.youtube.com/watch?v=G8CeP15EAS8")
-      scrapedData.mainImageUrl should be("https://i.ytimg.com/vi/G8CeP15EAS8/hqdefault.jpg")
+      scrapedData.mainImageUrl should (be("https://i.ytimg.com/vi/G8CeP15EAS8/hqdefault.jpg") or be("http://i.ytimg.com/vi/G8CeP15EAS8/hqdefault.jpg"))
       scrapedData.imageUrls should contain("https://i.ytimg.com/vi/G8CeP15EAS8/hqdefault.jpg")
     }
 

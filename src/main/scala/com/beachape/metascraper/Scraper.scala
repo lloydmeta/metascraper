@@ -17,10 +17,10 @@ class Scraper(httpClient: Http, urlSchemas: Seq[String])(implicit ec: ExecutionC
   private val urlValidator = new UrlValidator(urlSchemas.toArray)
 
   /**
-   * Returns a Future[Either[Throwable, String]] where the string is the response
-   * string
+   * Returns [[ScrapedData]]
    *
-   * Does an HTTP Follows redirects in location headers.
+   * - If the url is invalide, returns an illegal argument exception
+   * - If the url is for an image, returns immediately with links to the image
    *
    * @param message ScrapeUrl message
    * @return document Future[Document]
