@@ -9,7 +9,7 @@ import scala.collection.JavaConverters._
 import scala.concurrent.Future
 import dispatch._
 import org.apache.commons.validator.routines.UrlValidator
-import java.util.concurrent.{ExecutorService, Executors}
+import java.util.concurrent.Executors
 import com.ning.http.client.{AsyncHttpClientConfig, AsyncHttpClient}
 
 
@@ -57,17 +57,21 @@ class ScraperActor(
   // Validator
   val validSchemas = Seq("http", "https")
   val urlValidator = new UrlValidator(validSchemas.toArray)
+  val executorService = Executors.newFixedThreadPool(httpExecutorThreads)
 
   // Http client
   val followRedirects = true
   val connectionPooling = true
+  val compressionEnabled = true
   val config = new AsyncHttpClientConfig.Builder()
+    .setExecutorService(executorService)
+    .setIOThreadMultiplier(1) // otherwise we might not have enough threads
     .setMaximumConnectionsPerHost(maxConnectionsPerHost)
     .setAllowPoolingConnection(connectionPooling)
     .setAllowSslConnectionPool(connectionPooling)
     .setConnectionTimeoutInMs(connectionTimeoutInMs)
     .setRequestTimeoutInMs(requestTimeoutInMs)
-    .setCompressionEnabled(true)
+    .setCompressionEnabled(compressionEnabled)
     .setFollowRedirects(followRedirects).build
   val asyncHttpClient = new AsyncHttpClient(config)
   val httpClient = new Http(asyncHttpClient)
