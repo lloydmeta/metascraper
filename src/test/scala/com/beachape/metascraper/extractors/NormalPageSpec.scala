@@ -1,7 +1,7 @@
 package com.beachape.metascraper.extractors
 
 import org.jsoup.Jsoup
-import org.scalatest.{Matchers, FunSpec}
+import org.scalatest.{ Matchers, FunSpec }
 
 /**
  * Created by Lloyd on 2/15/15.
@@ -141,7 +141,6 @@ class NormalPageSpec extends FunSpec with Matchers with DocsSupport {
       }
 
     }
-
 
   }
 

@@ -56,3 +56,5 @@ pomExtra := (
     </developer>
   </developers>
 )
+
+scalariformSettings

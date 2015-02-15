@@ -1,13 +1,12 @@
 package com.beachape.metascraper
 
 import com.beachape.metascraper.Messages._
-import akka.actor.{ActorLogging, ActorRef, Actor, Props}
+import akka.actor.{ ActorLogging, ActorRef, Actor, Props }
 import dispatch._
 import java.util.concurrent.Executors
-import com.ning.http.client.{AsyncHttpClientConfig, AsyncHttpClient}
+import com.ning.http.client.{ AsyncHttpClientConfig, AsyncHttpClient }
 
-import scala.util.{Failure, Success}
-
+import scala.util.{ Failure, Success }
 
 /**
  * Companion object for instantiating ScaperActors
@@ -24,9 +23,9 @@ object ScraperActor {
    * @return Props for instantiating a ScaperActor
    */
   def apply(httpExecutorThreads: Int = 10,
-            maxConnectionsPerHost: Int = 30,
-            connectionTimeoutInMs: Int = 10000,
-            requestTimeoutInMs: Int = 15000) =
+    maxConnectionsPerHost: Int = 30,
+    connectionTimeoutInMs: Int = 10000,
+    requestTimeoutInMs: Int = 15000) =
     Props(
       classOf[ScraperActor],
       httpExecutorThreads,
@@ -42,11 +41,11 @@ object ScraperActor {
  * method
  */
 class ScraperActor(
-                    httpExecutorThreads: Int = 10,
-                    maxConnectionsPerHost: Int = 30,
-                    connectionTimeoutInMs: Int = 10000,
-                    requestTimeoutInMs: Int = 15000)
-  extends Actor with ActorLogging {
+  httpExecutorThreads: Int = 10,
+  maxConnectionsPerHost: Int = 30,
+  connectionTimeoutInMs: Int = 10000,
+  requestTimeoutInMs: Int = 15000)
+    extends Actor with ActorLogging {
 
   import context.dispatcher
 

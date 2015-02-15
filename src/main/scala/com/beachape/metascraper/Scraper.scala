@@ -1,13 +1,13 @@
 package com.beachape.metascraper
 
-import com.beachape.metascraper.Messages.{ScrapedData, ScrapeUrl}
+import com.beachape.metascraper.Messages.{ ScrapedData, ScrapeUrl }
 import com.beachape.metascraper.extractors.Schema
 import dispatch._
 import org.apache.commons.validator.routines.UrlValidator
 import org.jsoup.Jsoup
 import StringOps._
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ ExecutionContext, Future }
 
 /**
  * Created by Lloyd on 2/15/15.
@@ -37,7 +37,7 @@ class Scraper(httpClient: Http, urlSchemas: Seq[String])(implicit ec: ExecutionC
         "Accept-Language" -> Seq(message.acceptLanguageCode))
       val request = url(messageUrl).setHeaders(requestHeaders)
       val resp = httpClient(request OK as.String)
-      resp map ( s => extractData(s, messageUrl, message.schemas, message.numberOfImages) )
+      resp map (s => extractData(s, messageUrl, message.schemas, message.numberOfImages))
     }
   }
 
@@ -49,11 +49,11 @@ class Scraper(httpClient: Http, urlSchemas: Seq[String])(implicit ec: ExecutionC
    */
   def extractData(htmlString: String, url: String, schemaTypes: Seq[Schema], numberOfImages: Int): ScrapedData = {
     val doc = Jsoup.parse(htmlString, url)
-    val maybeUrl = schemaTypes.foldLeft(None: Option[String]) { (acc, schema ) => acc orElse(schema.extractUrl(doc)) }
-    val maybeTitle = schemaTypes.foldLeft(None: Option[String]) { (acc, schema ) => acc orElse(schema.extractTitle(doc)) }
-    val maybeDescription = schemaTypes.foldLeft(None: Option[String]) { (acc, schema ) => acc orElse(schema.extractDescription(doc)) }
-    val imageUrls = schemaTypes.foldLeft(Seq.empty[String]) { (acc, schema ) => acc ++ (schema.extractImages(doc)) }
-    val maybeMainImg = schemaTypes.foldLeft(None: Option[String]) { (acc, schema ) => acc orElse(schema.extractMainImage(doc)) }
+    val maybeUrl = schemaTypes.foldLeft(None: Option[String]) { (acc, schema) => acc orElse (schema.extractUrl(doc)) }
+    val maybeTitle = schemaTypes.foldLeft(None: Option[String]) { (acc, schema) => acc orElse (schema.extractTitle(doc)) }
+    val maybeDescription = schemaTypes.foldLeft(None: Option[String]) { (acc, schema) => acc orElse (schema.extractDescription(doc)) }
+    val imageUrls = schemaTypes.foldLeft(Seq.empty[String]) { (acc, schema) => acc ++ (schema.extractImages(doc)) }
+    val maybeMainImg = schemaTypes.foldLeft(None: Option[String]) { (acc, schema) => acc orElse (schema.extractMainImage(doc)) }
     ScrapedData(
       url = maybeUrl.getOrElse(url),
       title = maybeTitle.getOrElse(""),

@@ -2,25 +2,25 @@ package com.beachape.metascraper
 
 import org.scalatest.BeforeAndAfter
 import org.scalatest._
-import akka.testkit.{TestActorRef, TestKit, ImplicitSender}
+import akka.testkit.{ TestActorRef, TestKit, ImplicitSender }
 import akka.actor.ActorSystem
 import scala.io.Source
 import org.jsoup.Jsoup
-import com.beachape.metascraper.Messages.{ScrapedData, ScrapeUrl}
+import com.beachape.metascraper.Messages.{ ScrapedData, ScrapeUrl }
 import dispatch._, Defaults._
 import scala.concurrent.duration._
 
 class ScraperActorSpec extends TestKit(ActorSystem("testSystem"))
-  with FunSpecLike
-  with Matchers
-  with BeforeAndAfter
-  with ImplicitSender {
+    with FunSpecLike
+    with Matchers
+    with BeforeAndAfter
+    with ImplicitSender {
 
   val scraperActorRef = TestActorRef(new ScraperActor)
 
   describe("integration testing by sending ScrapeUrl messages") {
 
-    it ("should return proper data for a non-redirecting URL") {
+    it("should return proper data for a non-redirecting URL") {
       scraperActorRef ! ScrapeUrl("http://www.beachape.com/about/")
       val response = receiveOne(30 seconds).asInstanceOf[Either[Throwable, ScrapedData]]
       response should be('right)
@@ -32,7 +32,7 @@ class ScraperActorSpec extends TestKit(ActorSystem("testSystem"))
       scrapedData.imageUrls should contain("http://www.beachape.com/images/rss.png")
     }
 
-    it ("should return proper data for a redirecting URL") {
+    it("should return proper data for a redirecting URL") {
       scraperActorRef ! ScrapeUrl("http://youtu.be/G8CeP15EAS8/")
       val response = receiveOne(30 seconds).asInstanceOf[Either[Throwable, ScrapedData]]
       response should be('right)
@@ -44,7 +44,7 @@ class ScraperActorSpec extends TestKit(ActorSystem("testSystem"))
       scrapedData.imageUrls should contain("https://i.ytimg.com/vi/G8CeP15EAS8/hqdefault.jpg")
     }
 
-    it ("should return proper data for a URL with a page that does not contain OG links") {
+    it("should return proper data for a URL with a page that does not contain OG links") {
       scraperActorRef ! ScrapeUrl("http://imgur.com/gallery/ndVA6qs")
       val response = receiveOne(30 seconds).asInstanceOf[Either[Throwable, ScrapedData]]
       response should be('right)
@@ -62,13 +62,13 @@ class ScraperActorSpec extends TestKit(ActorSystem("testSystem"))
       response should be('left)
     }
 
-    it ("should return Left for a broken URL") {
+    it("should return Left for a broken URL") {
       scraperActorRef ! ScrapeUrl("http://beachape.com/asdfadgadskgjhagkjas")
       val response = receiveOne(30 seconds).asInstanceOf[Either[Throwable, ScrapedData]]
       response should be('left)
     }
 
-    it ("should return proper mostly Empty data for a URL that does not point to HTML") {
+    it("should return proper mostly Empty data for a URL that does not point to HTML") {
       scraperActorRef ! ScrapeUrl("http://www.beachape.com/downloads/code/scala/schwatcher_example.scala")
       val response = receiveOne(30 seconds).asInstanceOf[Either[Throwable, ScrapedData]]
       response should be('right)
@@ -80,7 +80,7 @@ class ScraperActorSpec extends TestKit(ActorSystem("testSystem"))
       scrapedData.imageUrls should be('empty)
     }
 
-    it ("should return the URL if it ends in any of the accepted image extenions") {
+    it("should return the URL if it ends in any of the accepted image extenions") {
       val imgUrl = "http://nonexistentsite.com/somethingnonexistent.jpg"
       scraperActorRef ! ScrapeUrl(imgUrl)
       val response = receiveOne(30 seconds).asInstanceOf[Either[Throwable, ScrapedData]]

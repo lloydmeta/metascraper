@@ -22,8 +22,7 @@ object NormalPage extends Schema {
     val imgSrc = doc.select("link[rel=image_src]").attr("abs:href")
     if (imgSrc.nonEmpty) {
       imgSrc +: doc.select("img[src]").iterator().asScala.toSeq.map(_.attr("abs:src"))
-    }
-    else {
+    } else {
       doc.select("img[src]").iterator().asScala.toSeq.map(_.attr("abs:src"))
     }
   }.getOrElse(Nil)

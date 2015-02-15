@@ -112,7 +112,6 @@ class OpenGraphSpec extends FunSpec with Matchers with DocsSupport {
 
     }
 
-
   }
 
 }
