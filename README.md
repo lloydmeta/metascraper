@@ -1,8 +1,9 @@
 # Metascraper [![Build Status](https://travis-ci.org/lloydmeta/metascraper.png?branch=master)](https://travis-ci.org/lloydmeta/metascraper) [![Coverage Status](https://coveralls.io/repos/lloydmeta/metascraper/badge.svg?branch=feature%2Fmultiple-schema-extractors)](https://coveralls.io/r/lloydmeta/metascraper?branch=feature%2Fmultiple-schema-extractors)
 
-A non-blocking Scala library built on Akka actors and [jsoup](http://jsoup.org/) that allows you to retrieve meta data from
-various URLs. Out of the box, supports HTML content (works with OpenGraph as well as normal HTML meta/image tags), but
-can be customised to any kind of content (just implement `Schema` and `SchemaFactory`)
+A non-blocking Scala library that allows you to retrieve meta data from various URLs.
+
+Out of the box, supports HTML content (works with OpenGraph as well as normal HTML meta/image tags), but can be customised to
+support any kind of content (just implement `Schema` and `SchemaFactory`).
 
 Tested against Scala 2.10.x, 2.11.x.
 
