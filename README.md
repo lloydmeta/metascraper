@@ -1,4 +1,4 @@
-# Metascraper [![Build Status](https://travis-ci.org/lloydmeta/metascraper.png?branch=master)](https://travis-ci.org/lloydmeta/metascraper)
+# Metascraper [![Build Status](https://travis-ci.org/lloydmeta/metascraper.png?branch=master)](https://travis-ci.org/lloydmeta/metascraper) [![Coverage Status](https://coveralls.io/repos/lloydmeta/metascraper/badge.svg?branch=feature%2Fmultiple-schema-extractors)](https://coveralls.io/r/lloydmeta/metascraper?branch=feature%2Fmultiple-schema-extractors)
 
 A non-blocking Scala library built on Akka actors and [jsoup](http://jsoup.org/) that allows you to retrieve meta data from pages at specified URLs, prioritising [Open Graph tags](http://ogp.me/) over traditional tags if they exist.
 
@@ -9,7 +9,7 @@ Tested against Scala 2.10.x, OpenJDK 6 and 7, and Oracle JDK 7.
 Add the following to your `build.sbt`
 
 ```scala
-libraryDependencies += "com.beachape.metascraper" %% "metascraper" % "0.2.5"
+libraryDependencies += "com.beachape.metascraper" %% "metascraper" % "0.2.6"
 ```
 
 If the above does not work because it cannot be resolved, its likely because it hasn't been synced to Maven central yet.
@@ -22,6 +22,21 @@ libraryDependencies += "com.beachape.metascraper" %% "metascraper" % "0.2.5-SNAP
 ```
 
 ## Example usage
+
+### Scraper
+
+```Scala
+// You can customise Http here (it is simply Dispatcher's Http client)
+val scraper = new Scraper(Http, Seq("http", "https"))
+
+val fData: Future[ScrapedData] = scraper.fetch(ScrapeUrl("https://google.com"))
+
+```
+
+### ScraperActor
+
+If you prefer to use a Scraper actor (e.g. to distribute load to remote systems), use ScraperActor:
+
 ```scala
 import akka.actor.ActorSystem
 import com.beachape.metascraper.Messages._
@@ -63,6 +78,12 @@ for {
   http://news.bbcimg.co.uk/media/images/69612000/jpg/_69612953_69612952.jpg
 */
 ```
+
+### Custom scraping schema
+
+You can choose to customise scraping by implementing `Schema` and passing it as one of the schemas used to scrape a your
+URL in the `ScrapeUrl` message.
+
 
 ## Example applications
 

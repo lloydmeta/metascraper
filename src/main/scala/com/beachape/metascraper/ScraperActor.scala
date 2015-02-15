@@ -1,17 +1,12 @@
 package com.beachape.metascraper
 
 import com.beachape.metascraper.Messages._
-import com.beachape.metascraper.StringOps._
-import akka.actor.{ActorLogging, ActorRef, Actor, Props}
-import org.jsoup.Jsoup
-import org.jsoup.nodes.Document
-import scala.collection.JavaConverters._
-import scala.concurrent.Future
+import akka.actor.{ ActorLogging, ActorRef, Actor, Props }
 import dispatch._
-import org.apache.commons.validator.routines.UrlValidator
 import java.util.concurrent.Executors
-import com.ning.http.client.{AsyncHttpClientConfig, AsyncHttpClient}
+import com.ning.http.client.{ AsyncHttpClientConfig, AsyncHttpClient }
 
+import scala.util.{ Failure, Success }
 
 /**
  * Companion object for instantiating ScaperActors
@@ -28,9 +23,9 @@ object ScraperActor {
    * @return Props for instantiating a ScaperActor
    */
   def apply(httpExecutorThreads: Int = 10,
-            maxConnectionsPerHost: Int = 30,
-            connectionTimeoutInMs: Int = 10000,
-            requestTimeoutInMs: Int = 15000) =
+    maxConnectionsPerHost: Int = 30,
+    connectionTimeoutInMs: Int = 10000,
+    requestTimeoutInMs: Int = 15000) =
     Props(
       classOf[ScraperActor],
       httpExecutorThreads,
@@ -46,24 +41,23 @@ object ScraperActor {
  * method
  */
 class ScraperActor(
-                    httpExecutorThreads: Int = 10,
-                    maxConnectionsPerHost: Int = 30,
-                    connectionTimeoutInMs: Int = 10000,
-                    requestTimeoutInMs: Int = 15000)
-  extends Actor with ActorLogging {
+  httpExecutorThreads: Int = 10,
+  maxConnectionsPerHost: Int = 30,
+  connectionTimeoutInMs: Int = 10000,
+  requestTimeoutInMs: Int = 15000)
+    extends Actor with ActorLogging {
 
   import context.dispatcher
 
   // Validator
   val validSchemas = Seq("http", "https")
-  val urlValidator = new UrlValidator(validSchemas.toArray)
-  val executorService = Executors.newFixedThreadPool(httpExecutorThreads)
-
-  // Http client
+  // Http client config
   val followRedirects = true
   val connectionPooling = true
   val compressionEnabled = true
-  val config = new AsyncHttpClientConfig.Builder()
+
+  private val executorService = Executors.newFixedThreadPool(httpExecutorThreads)
+  private val config = new AsyncHttpClientConfig.Builder()
     .setExecutorService(executorService)
     .setIOThreadMultiplier(1) // otherwise we might not have enough threads
     .setMaximumConnectionsPerHost(maxConnectionsPerHost)
@@ -73,178 +67,28 @@ class ScraperActor(
     .setRequestTimeoutInMs(requestTimeoutInMs)
     .setCompressionEnabled(compressionEnabled)
     .setFollowRedirects(followRedirects).build
-  val asyncHttpClient = new AsyncHttpClient(config)
-  val httpClient = new Http(asyncHttpClient)
+  private val asyncHttpClient = new AsyncHttpClient(config)
+  private val httpClient = new Http(asyncHttpClient)
+
+  private val scraper = new Scraper(httpClient, validSchemas)
 
   override def postStop() {
     httpClient.shutdown()
+    executorService.shutdown()
   }
 
   def receive = {
 
     case message: ScrapeUrl => {
-      message match {
-        case ScrapeUrl(url, _, _) if !urlValidator.isValid(url) =>
-          sender ! Left(new Throwable(s"Invalid url ${message.url}"))
-        case ScrapeUrl(url, _, _) if url.hasImageExtension =>
-          sender ! Right(ScrapedData(url, url, url, url, Seq(url)))
-        case _ => {
-          val zender = sender
-          for (futureEither <- getStringFromUrl(message)) {
-            futureEither match {
-              case Right(responseString) => self ! ScrapeString(responseString, message.url, zender)
-              case Left(throwable) => logAndForwardErrorAsLeft(throwable, zender)
-            }
-          }
-        }
-      }
-    }
-
-    case message: ScrapeString => {
-      try {
-        val document = Jsoup.parse(message.string, message.url)
-        val extractedData = extractScrapedData(document, message.url)
-        message.zender ! Right(extractedData)
-      } catch {
-        case e: Exception => logAndForwardErrorAsLeft(e, message.zender)
+      val zender = sender()
+      val fScrapedData = scraper.fetch(message)
+      fScrapedData onComplete {
+        case Success(data) => zender ! Right(data)
+        case Failure(e) => logAndForwardErrorAsLeft(e, zender)
       }
     }
 
     case _ => log.error("Scraper Actor received an unexpected message :( !")
-  }
-
-  /**
-   * Returns a Future[Either[Throwable, String]] where the string is the response
-   * string
-   *
-   * Does an HTTP Follows redirects in location headers.
-   *
-   * @param message ScrapeUrl message
-   * @return document Future[Document]
-   */
-  def getStringFromUrl(message: ScrapeUrl): Future[Either[Throwable, String]] = {
-    val requestHeaders = Map(
-      "User-Agent" -> Seq(message.userAgent),
-      "Accept-Language" -> Seq(message.acceptLanguageCode))
-    val request = url(message.url).setHeaders(requestHeaders)
-    val resp = httpClient(request OK as.String).either
-    for (throwable <- resp.left) yield throwable
-  }
-
-  /**
-   * Returns a ScrapedData object filled out using data extracted
-   * from a JSoup document
-   *
-   * Prioritises Open Graph tags https://developers.facebook.com/docs/opengraph/
-   * over conventional tags like <title>
-   *
-   * @param doc Document as parsed by JSoup
-   * @return ScrapedData
-   */
-  def extractScrapedData(doc: Document, accessedUrl: String): ScrapedData = {
-    ScrapedData(
-      extractUrl(doc, accessedUrl),
-      extractTitle(doc),
-      extractDescription(doc),
-      extractMainImage(doc),
-      extractImages(doc)
-    )
-  }
-
-  /**
-   * Returns the url of a Jsoup document
-   *
-   * Prioritises <meta property="og:url" .. > tag over the url used
-   * to access this document
-   *
-   * @param doc Document as parsed by JSoup
-   * @return String url
-   */
-  def extractUrl(doc: Document, accessedUrl: String): String = {
-    if (!doc.select("meta[property=og:url]").attr("content").isEmpty) {
-      doc.select("meta[property=og:url]").attr("content")
-    } else {
-      accessedUrl
-    }
-  }
-
-  /**
-   * Returns the title of a Jsoup document
-   *
-   * Prioritises <meta property="og:title" .. > tag over <title> tag
-   *
-   * @param doc Document as parsed by JSoup
-   * @return String title
-   */
-  def extractTitle(doc: Document): String = {
-    if (!doc.select("meta[property=og:title]").attr("content").isEmpty) {
-      doc.select("meta[property=og:title]").attr("content")
-    } else {
-      doc.title()
-    }
-  }
-
-  /**
-   * Returns the description of a Jsoup document
-   *
-   * Prioritises <meta property="og:description" .. > tag over <meta name="description" .. > tag
-   *
-   * @param doc Document as parsed by JSoup
-   * @return String description
-   */
-  def extractDescription(doc: Document): String = {
-    if (!doc.select("meta[property=og:description]").attr("content").isEmpty) {
-      doc.select("meta[property=og:description]").attr("content")
-    } else if (!doc.select("meta[name=description]").attr("content").isEmpty) {
-      doc.select("meta[name=description]").attr("content")
-    } else {
-      val firstParagraph = doc.select("p").text
-      if (firstParagraph.length > 300)
-        s"${firstParagraph.take(300)}..."
-      else
-        firstParagraph
-    }
-  }
-
-  /**
-   * Returns a best guess for the url of the main Image of a Jsoup document
-   *
-   * Prioritises the first <meta property="og:image" .. > tag over the
-   * first <img ..> tag
-   *
-   * @param doc Document as parsed by JSoup
-   * @return String url of the main image
-   */
-  def extractMainImage(doc: Document): String = {
-    extractImages(doc) match {
-      case images: Seq[String] if !images.isEmpty => images.head
-      case _ => ""
-    }
-  }
-
-  /**
-   * Returns a best guess for the best images of a Jsoup document
-   *
-   * * Prioritises <meta property="og:image" .. > tags over <img .. > tags
-   *
-   * @param doc Document as parsed by Jsoup
-   * @param takeFirst Number of elements to take, defaults to 5
-   * @return Seq[String] collection of image urls
-   */
-  def extractImages(doc: Document, takeFirst: Int = 5): Seq[String] = {
-    if (!doc.select("meta[property=og:image]").attr("content").isEmpty) {
-      val ogImageSrcs = doc.select("meta[property=og:image]").iterator().asScala.take(takeFirst).toSeq.map(_.attr("abs:content"))
-      if (ogImageSrcs.size < takeFirst)
-        ogImageSrcs ++ doc.select("img[src]").iterator().asScala.take(takeFirst - ogImageSrcs.size).toSeq.map(_.attr("abs:src"))
-      else
-        ogImageSrcs
-    } else if (!doc.select("link[rel=image_src]").attr("href").isEmpty) {
-      val imageRelSrc = doc.select("link[rel=image_src]").attr("abs:href")
-      imageRelSrc +: doc.select("img[src]").iterator().asScala.take(takeFirst - 1).toSeq.map(_.attr("abs:src"))
-    }
-    else {
-      doc.select("img[src]").iterator().asScala.take(takeFirst).toSeq.map(_.attr("abs:src"))
-    }
   }
 
   /**
