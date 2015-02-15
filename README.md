@@ -11,7 +11,7 @@ Tested against Scala 2.10.x, 2.11.x.
 Add the following to your `build.sbt`
 
 ```scala
-libraryDependencies += "com.beachape.metascraper" %% "metascraper" % "0.2.6"
+libraryDependencies += "com.beachape.metascraper" %% "metascraper" % "0.2.7"
 ```
 
 If the above does not work because it cannot be resolved, its likely because it hasn't been synced to Maven central yet.
