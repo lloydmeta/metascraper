@@ -15,9 +15,7 @@ case class OpenGraph(doc: Document) extends HtmlSchema {
   def extractTitle: Option[String] = nonEmptyContent(doc, "meta[property=og:title]")
 
   lazy val extractImages: Seq[String] = {
-    Try {
-      doc.select("meta[property=og:image]").iterator().asScala.toSeq.map(_.attr("abs:content"))
-    }.getOrElse(Nil)
+    doc.select("meta[property=og:image]").iterator().asScala.toSeq.map(_.attr("abs:content"))
   }
 
   def extractDescription: Option[String] = nonEmptyContent(doc, "meta[property=og:description]")
