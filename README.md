@@ -1,4 +1,4 @@
-# Metascraper [![Build Status](https://travis-ci.org/lloydmeta/metascraper.png?branch=master)](https://travis-ci.org/lloydmeta/metascraper) [![Coverage Status](https://coveralls.io/repos/lloydmeta/metascraper/badge.svg?branch=feature%2Fmultiple-schema-extractors)](https://coveralls.io/r/lloydmeta/metascraper?branch=feature%2Fmultiple-schema-extractors)
+# Metascraper [![Build Status](https://travis-ci.org/lloydmeta/metascraper.svg?branch=master)](https://travis-ci.org/lloydmeta/metascraper) [![Coverage Status](https://coveralls.io/repos/lloydmeta/metascraper/badge.svg?branch=master)](https://coveralls.io/r/lloydmeta/metascraper?branch=master)
 
 A non-blocking Scala library that allows you to retrieve meta data from various URLs.
 
