@@ -5,7 +5,7 @@ import org.scalatest._
 import akka.testkit.{ TestActorRef, TestKit, ImplicitSender }
 import akka.actor.ActorSystem
 import com.beachape.metascraper.Messages.{ ScrapedData, ScrapeUrl }
-import dispatch._
+import scala.language.postfixOps
 import scala.concurrent.duration._
 
 class ScraperActorSpec extends TestKit(ActorSystem("testSystem"))

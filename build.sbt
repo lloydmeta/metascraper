@@ -1,6 +1,6 @@
 name := "metascraper"
 
-version := "0.2.5"
+version := "0.2.6-SNAPSHOT"
 
 scalaVersion := "2.11.5"
 
@@ -34,6 +34,8 @@ publishMavenStyle := true
 publishArtifact in Test := false
 
 pomIncludeRepository := { _ => false }
+
+scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature", "-Xlint", "-Xlog-free-terms")
 
 pomExtra := (
   <url>https://github.com/lloydmeta/metascraper</url>
