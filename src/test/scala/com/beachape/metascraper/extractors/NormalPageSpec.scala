@@ -1,5 +1,6 @@
 package com.beachape.metascraper.extractors
 
+import com.beachape.metascraper.extractors.html.NormalPage
 import org.jsoup.Jsoup
 import org.scalatest.{ Matchers, FunSpec }
 
@@ -8,14 +9,15 @@ import org.scalatest.{ Matchers, FunSpec }
  */
 class NormalPageSpec extends FunSpec with Matchers with DocsSupport {
 
-  val subject = NormalPage
-
   describe("#extractUrl") {
 
     describe("for docs without a base Url") {
 
       it("should return None") {
-        docs.map(subject.extractUrl).forall(_ == None) shouldBe true
+        docs.map { doc =>
+          val subject = NormalPage(doc)
+          subject.extractUrl
+        }.forall(_ == None) shouldBe true
       }
 
     }
@@ -25,7 +27,7 @@ class NormalPageSpec extends FunSpec with Matchers with DocsSupport {
       it("should return the base Uri") {
         val doc = Jsoup.parse(withoutOgTagsSource.mkString)
         doc.setBaseUri("hello")
-        subject.extractUrl(doc) shouldBe Some("hello")
+        NormalPage(doc).extractUrl shouldBe Some("hello")
       }
 
     }
@@ -37,8 +39,8 @@ class NormalPageSpec extends FunSpec with Matchers with DocsSupport {
     describe("for a page with a title tag") {
 
       it("should return the contents of the <title> tag") {
-        subject.extractTitle(withOgTagsDoc) shouldBe Some("With Open Graph tags")
-        subject.extractTitle(withoutOgTagsDoc) shouldBe Some("Without Open Graph tags")
+        NormalPage(withOgTagsDoc).extractTitle shouldBe Some("With Open Graph tags")
+        NormalPage(withoutOgTagsDoc).extractTitle shouldBe Some("Without Open Graph tags")
       }
 
     }
@@ -46,7 +48,7 @@ class NormalPageSpec extends FunSpec with Matchers with DocsSupport {
     describe("for a page without title tags") {
 
       it("should return None") {
-        subject.extractTitle(withoutAnyTagsDoc) shouldBe None
+        NormalPage(withoutAnyTagsDoc).extractTitle shouldBe None
       }
 
     }
@@ -57,7 +59,7 @@ class NormalPageSpec extends FunSpec with Matchers with DocsSupport {
     describe("for a page without description tags") {
 
       it("should return None") {
-        subject.extractDescription(withoutAnyTagsDoc) shouldBe None
+        NormalPage(withoutAnyTagsDoc).extractDescription shouldBe None
       }
 
     }
@@ -65,7 +67,7 @@ class NormalPageSpec extends FunSpec with Matchers with DocsSupport {
     describe("for a page with description tags") {
 
       it("should return the contents of the description tag") {
-        subject.extractDescription(withOgTagsDoc) shouldBe Some("A Description in heeere")
+        NormalPage(withOgTagsDoc).extractDescription shouldBe Some("A Description in heeere")
 
       }
 
@@ -74,8 +76,7 @@ class NormalPageSpec extends FunSpec with Matchers with DocsSupport {
     describe("for a page with just p tags") {
 
       it("should return the contents of the first p") {
-        subject.extractDescription(withOnlyPTagDoc).get should include("is an object-functional programming and scripting language for general software applications")
-
+        NormalPage(withOnlyPTagDoc).extractDescription.get should include("is an object-functional programming and scripting language for general software applications")
       }
     }
   }
@@ -85,7 +86,7 @@ class NormalPageSpec extends FunSpec with Matchers with DocsSupport {
     describe("for a page without image tags") {
 
       it("should return an empty sequence") {
-        subject.extractImages(withoutAnyTagsDoc) shouldBe 'empty
+        NormalPage(withoutAnyTagsDoc).extractImages shouldBe 'empty
       }
 
     }
@@ -93,7 +94,7 @@ class NormalPageSpec extends FunSpec with Matchers with DocsSupport {
     describe("for a page with image tags") {
 
       it("should return the src contents of the image sources") {
-        subject.extractImages(withoutOgTagsDoc) shouldBe
+        NormalPage(withoutOgTagsDoc).extractImages shouldBe
           Seq("http://lolol.com/thing1.gif",
             "http://lolol.com/thing2.jpg",
             "http://lolol.com/thing3.jpg",
@@ -108,7 +109,7 @@ class NormalPageSpec extends FunSpec with Matchers with DocsSupport {
     describe("for a page with an image rel tag") {
 
       it("should return the src contents of the image sources, including the image_rel") {
-        subject.extractImages(withOnlyImageRelDoc) shouldBe
+        NormalPage(withOnlyImageRelDoc).extractImages shouldBe
           Seq("http://lala.com/theMainImage.png")
       }
 
@@ -121,7 +122,7 @@ class NormalPageSpec extends FunSpec with Matchers with DocsSupport {
     describe("for a page without image tags") {
 
       it("should return None") {
-        subject.extractMainImage(withoutAnyTagsDoc) shouldBe None
+        NormalPage(withoutAnyTagsDoc).extractMainImage shouldBe None
       }
 
     }
@@ -129,7 +130,7 @@ class NormalPageSpec extends FunSpec with Matchers with DocsSupport {
     describe("for a page with image tags") {
 
       it("should return the src contents of the first image tag") {
-        subject.extractMainImage(withoutOgTagsDoc) shouldBe Some("http://lolol.com/thing1.gif")
+        NormalPage(withoutOgTagsDoc).extractMainImage shouldBe Some("http://lolol.com/thing1.gif")
       }
 
     }
@@ -137,7 +138,7 @@ class NormalPageSpec extends FunSpec with Matchers with DocsSupport {
     describe("for a page with an image rel tag") {
 
       it("should return the src content of the image_rel") {
-        subject.extractMainImage(withOnlyImageRelDoc) shouldBe Some("http://lala.com/theMainImage.png")
+        NormalPage(withOnlyImageRelDoc).extractMainImage shouldBe Some("http://lala.com/theMainImage.png")
       }
 
     }
