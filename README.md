@@ -2,8 +2,8 @@
 
 A non-blocking Scala library that allows you to retrieve meta data from various URLs.
 
-Out of the box, supports HTML content (works with OpenGraph as well as normal HTML meta/image tags), but can be customised to
-support any kind of content (just implement `Schema` and `SchemaFactory`).
+Out of the box, supports HTML content (works with OpenGraph as well as normal HTML meta/image tags), but can be easily extended to
+support any kind of content (just implement `Schema` and `SchemaFactory`) so that you can work with any URL that returns an Array of Bytes.
 
 Tested against Scala 2.10.x, 2.11.x.
 
@@ -119,7 +119,7 @@ it generates. That way, only one String to Document parse needs to happen.
 
 The MIT License (MIT)
 
-Copyright (c) 2013 by Lloyd Chan
+Copyright (c) 2015 by Lloyd Chan
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
