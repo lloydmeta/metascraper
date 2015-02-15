@@ -38,7 +38,7 @@ class Scraper(httpClient: Http, urlSchemas: Seq[String])(implicit ec: ExecutionC
         "Accept-Language" -> Seq(message.acceptLanguageCode))
       val request = url(messageUrl).setHeaders(requestHeaders)
       val resp = httpClient(request)
-      resp map (s => extractData(s, messageUrl, message.schemas, message.numberOfImages))
+      resp map (s => extractData(s, messageUrl, message.schemaFactories, message.numberOfImages))
     }
   }
 
