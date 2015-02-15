@@ -2,12 +2,9 @@ package com.beachape.metascraper.extractors.html
 
 import com.beachape.metascraper.extractors.{ SchemaFactory, Schema }
 import com.ning.http.client.Response
-import dispatch.StatusCode
 import dispatch.as.String
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-
-import scala.util.Try
 
 /**
  * Created by Lloyd on 2/15/15.
