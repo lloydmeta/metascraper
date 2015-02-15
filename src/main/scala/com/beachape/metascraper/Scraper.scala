@@ -1,17 +1,14 @@
 package com.beachape.metascraper
 
-import akka.event.Logging
 import com.beachape.metascraper.Messages.{ ScrapedData, ScrapeUrl }
 import com.beachape.metascraper.extractors.{ SchemaFactory, Schema }
 import com.ning.http.client.Response
 import dispatch._
-import dispatch.as.String
 import org.apache.commons.validator.routines.UrlValidator
-import org.jsoup.Jsoup
 import StringOps._
 
 import scala.concurrent.{ ExecutionContext, Future }
-import scala.util.{ Failure, Success, Try }
+import scala.util._
 
 /**
  * Created by Lloyd on 2/15/15.
