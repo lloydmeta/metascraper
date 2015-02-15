@@ -5,10 +5,10 @@ import com.beachape.metascraper.extractors.{ SchemaFactory, Schema }
 import com.ning.http.client.Response
 import dispatch._
 import org.apache.commons.validator.routines.UrlValidator
-import org.jsoup.Jsoup
 import StringOps._
 
 import scala.concurrent.{ ExecutionContext, Future }
+import scala.util._
 
 /**
  * Created by Lloyd on 2/15/15.
@@ -49,19 +49,23 @@ class Scraper(httpClient: Http, urlSchemas: Seq[String])(implicit ec: ExecutionC
    * list get precedence over those towards the end
    */
   def extractData(resp: Response, url: String, schemaFactories: Seq[SchemaFactory], numberOfImages: Int): ScrapedData = {
-    val schemas = schemaFactories.toStream.flatMap(_.apply(resp)) // Stream in case we have expensive factories
-    val maybeUrl = schemas.foldLeft(None: Option[String]) { (acc, schema) => acc orElse schema.extractUrl }
-    val maybeTitle = schemas.foldLeft(None: Option[String]) { (acc, schema) => acc orElse schema.extractTitle }
-    val maybeDescription = schemas.foldLeft(None: Option[String]) { (acc, schema) => acc orElse schema.extractDescription }
-    val imageUrls = schemas.foldLeft(Seq.empty[String]) { (acc, schema) => acc ++ schema.extractImages }
-    val maybeMainImg = schemas.foldLeft(None: Option[String]) { (acc, schema) => acc orElse schema.extractMainImage }
-    ScrapedData(
-      url = maybeUrl.getOrElse(url),
-      title = maybeTitle.getOrElse(""),
-      description = maybeDescription.getOrElse(""),
-      imageUrls = imageUrls.take(numberOfImages),
-      mainImageUrl = maybeMainImg.getOrElse("")
-    )
+    if (resp.getStatusCode / 100 == 2) {
+      val schemas = schemaFactories.toStream.flatMap(_.apply(resp)) // Stream in case we have expensive factories
+      val maybeUrl = schemas.flatMap(s => Try(s.extractUrl).toOption).find(_.isDefined).getOrElse(None)
+      val maybeTitle = schemas.flatMap(s => Try(s.extractTitle).toOption).find(_.isDefined).getOrElse(None)
+      val maybeDescription = schemas.flatMap(s => Try(s.extractDescription).toOption).find(_.isDefined).getOrElse(None)
+      val imageUrls = schemas.foldLeft(Stream.empty[String]) { (acc, schema) => acc ++ Try(schema.extractImages).getOrElse(Nil) }
+      val maybeMainImg = schemas.flatMap(s => Try(s.extractMainImage).toOption).find(_.isDefined).getOrElse(None)
+      ScrapedData(
+        url = maybeUrl.getOrElse(url),
+        title = maybeTitle.getOrElse(""),
+        description = maybeDescription.getOrElse(""),
+        imageUrls = imageUrls.take(numberOfImages),
+        mainImageUrl = maybeMainImg.getOrElse("")
+      )
+    } else {
+      throw StatusCode(resp.getStatusCode)
+    }
   }
 
 }

@@ -3,7 +3,6 @@ package com.beachape.metascraper.extractors.html
 import org.jsoup.nodes.Document
 
 import scala.collection.JavaConverters._
-import scala.util.Try
 
 /**
  * Created by Lloyd on 2/15/15.
@@ -14,19 +13,19 @@ import scala.util.Try
  */
 case class NormalPage(doc: Document) extends HtmlSchema {
 
-  def extractUrl: Option[String] = Try(doc.baseUri()).toOption.filter(_.nonEmpty)
+  def extractUrl: Option[String] = Option(doc.baseUri()).filter(_.nonEmpty)
 
-  def extractTitle: Option[String] = Try(doc.title()).toOption.filter(_.nonEmpty)
+  def extractTitle: Option[String] = Option(doc.title()).filter(_.nonEmpty)
 
-  lazy val extractImages: Seq[String] = Try {
+  lazy val extractImages: Seq[String] = {
     val imgSrc = doc.select("link[rel=image_src]").attr("abs:href")
     if (imgSrc.nonEmpty)
       imgSrc +: doc.select("img[src]").iterator().asScala.toSeq.map(_.attr("abs:src"))
     else
       doc.select("img[src]").iterator().asScala.toSeq.map(_.attr("abs:src"))
-  }.getOrElse(Nil)
+  }
 
-  def extractDescription: Option[String] = Try {
+  def extractDescription: Option[String] = Option {
     val metaDesc = doc.select("meta[name=description]").attr("content")
     if (metaDesc.nonEmpty) {
       metaDesc
@@ -37,7 +36,7 @@ case class NormalPage(doc: Document) extends HtmlSchema {
       else
         firstParagraph
     }
-  }.toOption.filter(_.nonEmpty)
+  }.filter(_.nonEmpty)
 
   def extractMainImage: Option[String] = extractImages.headOption
 }

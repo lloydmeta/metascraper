@@ -21,21 +21,17 @@ trait HtmlSchema extends Schema {
    *
    * Returns None if it is empty
    */
-  protected def nonEmptyContent(doc: Document, selector: String): Option[String] = Try {
+  protected def nonEmptyContent(doc: Document, selector: String): Option[String] = Option {
     doc.select(selector).attr("content")
-  }.toOption.filter(_.nonEmpty)
+  }.filter(_.nonEmpty)
 
 }
 
 case class HtmlSchemas(schemas: (Document => HtmlSchema)*) extends SchemaFactory {
 
   def apply(resp: Response): Seq[HtmlSchema] = {
-    if (resp.getStatusCode / 100 == 2) {
-      val doc = Jsoup.parse(String(resp), resp.getUri.toString)
-      schemas.map(_.apply(doc))
-    } else {
-      throw StatusCode(resp.getStatusCode)
-    }
+    val doc = Jsoup.parse(String(resp), resp.getUri.toString)
+    schemas.map(_.apply(doc))
   }
 
 }
