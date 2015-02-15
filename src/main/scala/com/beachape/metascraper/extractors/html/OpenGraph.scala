@@ -2,7 +2,6 @@ package com.beachape.metascraper.extractors.html
 
 import org.jsoup.nodes.Document
 
-import scala.util.Try
 import scala.collection.JavaConverters._
 
 /**

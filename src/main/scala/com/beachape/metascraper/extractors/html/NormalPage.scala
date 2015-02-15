@@ -3,7 +3,6 @@ package com.beachape.metascraper.extractors.html
 import org.jsoup.nodes.Document
 
 import scala.collection.JavaConverters._
-import scala.util.Try
 
 /**
  * Created by Lloyd on 2/15/15.
