@@ -1,24 +1,20 @@
 package com.beachape.metascraper
 
 import org.scalatest.BeforeAndAfter
-import org.scalatest.FunSpec
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest._
 import akka.testkit.{TestActorRef, TestKit, ImplicitSender}
 import akka.actor.ActorSystem
 import scala.io.Source
 import org.jsoup.Jsoup
 import com.beachape.metascraper.Messages.{ScrapedData, ScrapeUrl}
-import com.beachape.support.Betamax
-import co.freeside.betamax.TapeMode
 import dispatch._, Defaults._
 import scala.concurrent.duration._
 
 class ScraperActorSpec extends TestKit(ActorSystem("testSystem"))
-  with FunSpec
-  with ShouldMatchers
+  with FunSpecLike
+  with Matchers
   with BeforeAndAfter
-  with ImplicitSender
-  with Betamax {
+  with ImplicitSender {
 
   val scraperActorRef = TestActorRef(new ScraperActor)
   val scraperActor = scraperActorRef.underlyingActor
@@ -40,8 +36,7 @@ class ScraperActorSpec extends TestKit(ActorSystem("testSystem"))
 
   describe("#getStringFromUrl") {
 
-    // Make sure to use a trailing slash at the end .. https://github.com/robfletcher/betamax/issues/61
-    it("should return a string of the HTML at that page") _ using betamax("test-beachape.com", Some(TapeMode.READ_ONLY)) {
+    it("should return a string of the HTML at that page") {
       val simpleDispatchResult = Http(url("http://www.beachape.com/about/") OK as.String)
       val futureEither = scraperActor.getStringFromUrl(ScrapeUrl("http://www.beachape.com/about/"))
       for{
@@ -272,19 +267,19 @@ class ScraperActorSpec extends TestKit(ActorSystem("testSystem"))
 
   describe("integration testing by sending ScrapeUrl messages") {
 
-    it ("should return proper data for a non-redirecting URL") _ using betamax("test-beachape.com", Some(TapeMode.READ_ONLY)) {
+    it ("should return proper data for a non-redirecting URL") {
       scraperActorRef ! ScrapeUrl("http://www.beachape.com/about/")
       val response = receiveOne(30 seconds).asInstanceOf[Either[Throwable, ScrapedData]]
       response should be('right)
       val Right(scrapedData) = response
-      scrapedData.title should be("About me - BeachApe.")
-      scrapedData.description should be("About Me Sep 5th, 2013 General stuff My name is Lloyd Chan (online, my handles are lloydmeta or meta_Lloyd) and I currently live in Tokyo, Japan. I …")
+      scrapedData.title should be("About Me - BeachApe.")
+      scrapedData.description should startWith("Sep 5th, 2013 My name is Lloyd Chan")
       scrapedData.url should be("http://www.beachape.com/about/")
-      scrapedData.mainImageUrl should be('empty)
-      scrapedData.imageUrls should be('empty)
+      scrapedData.mainImageUrl shouldBe "http://www.beachape.com/images/rss.png"
+      scrapedData.imageUrls should contain("http://www.beachape.com/images/rss.png")
     }
 
-    it ("should return proper data for a redirecting URL") _ using betamax("test-youtu.be-redirecting", Some(TapeMode.READ_ONLY)) {
+    it ("should return proper data for a redirecting URL") {
       scraperActorRef ! ScrapeUrl("http://youtu.be/G8CeP15EAS8/")
       val response = receiveOne(30 seconds).asInstanceOf[Either[Throwable, ScrapedData]]
       response should be('right)
@@ -292,20 +287,20 @@ class ScraperActorSpec extends TestKit(ActorSystem("testSystem"))
       scrapedData.title should be("未来のライター Jii！Jii！Jii！")
       scrapedData.description should be("未来のライター【Jii】のテーマソング！ 詳細はこちら→http://jii-lighter.com/ USB充電式電熱線ライター【Jii】はガス不要！風に強い！USB充電で繰り返し使える！安心・安全で環境に優しい！")
       scrapedData.url should be("http://www.youtube.com/watch?v=G8CeP15EAS8")
-      scrapedData.mainImageUrl should be("http://i1.ytimg.com/vi/G8CeP15EAS8/hqdefault.jpg")
-      scrapedData.imageUrls should contain("http://i1.ytimg.com/vi/G8CeP15EAS8/hqdefault.jpg")
+      scrapedData.mainImageUrl should be("https://i.ytimg.com/vi/G8CeP15EAS8/hqdefault.jpg")
+      scrapedData.imageUrls should contain("https://i.ytimg.com/vi/G8CeP15EAS8/hqdefault.jpg")
     }
 
-    it ("should return proper data for a URL with a page that does not contain OG links") _ using betamax("test-imgur", Some(TapeMode.READ_ONLY)) {
+    it ("should return proper data for a URL with a page that does not contain OG links") {
       scraperActorRef ! ScrapeUrl("http://imgur.com/gallery/ndVA6qs")
       val response = receiveOne(30 seconds).asInstanceOf[Either[Throwable, ScrapedData]]
       response should be('right)
       val Right(scrapedData) = response
-      scrapedData.title should be("What I imagine entering the job market in the 90s must have been like... - Imgur")
-      scrapedData.description should be("Imgur is home to the web's most popular image content, curated in real time by a dedicated community through commenting, voting and sharing.")
+      scrapedData.title should startWith("What I imagine entering the job")
+      scrapedData.description should startWith("The Internet's visual storytelling community")
       scrapedData.url should be("http://imgur.com/gallery/ndVA6qs")
-      scrapedData.mainImageUrl should be("http://i.imgur.com/ndVA6qs.png")
-      scrapedData.imageUrls should contain("http://i.imgur.com/ndVA6qs.png")
+      scrapedData.mainImageUrl should be("http://i.imgur.com/ndVA6qs.png?fb")
+      scrapedData.imageUrls should contain("http://i.imgur.com/ndVA6qs.png?fb")
     }
 
     it("should return Left for an invalid URL") {
@@ -314,20 +309,20 @@ class ScraperActorSpec extends TestKit(ActorSystem("testSystem"))
       response should be('left)
     }
 
-    it ("should return Left for a broken URL") _ using betamax("test-beachape.com-broken", Some(TapeMode.READ_ONLY)) {
-      scraperActorRef ! ScrapeUrl("http://beachape.com/asdfadgadskgjhagkjas/")
+    it ("should return Left for a broken URL") {
+      scraperActorRef ! ScrapeUrl("http://beachape.com/asdfadgadskgjhagkjas")
       val response = receiveOne(30 seconds).asInstanceOf[Either[Throwable, ScrapedData]]
       response should be('left)
     }
 
-    it ("should return proper mostly Empty data for a URL that does not point to HTML") _ using betamax("test-beachape.com-non-HTML", Some(TapeMode.READ_ONLY)) {
-      scraperActorRef ! ScrapeUrl("http://www.beachape.com/downloads/code/scala/schwatcher_example.scala/")
+    it ("should return proper mostly Empty data for a URL that does not point to HTML") {
+      scraperActorRef ! ScrapeUrl("http://www.beachape.com/downloads/code/scala/schwatcher_example.scala")
       val response = receiveOne(30 seconds).asInstanceOf[Either[Throwable, ScrapedData]]
       response should be('right)
       val Right(scrapedData) = response
       scrapedData.title should be('empty)
       scrapedData.description should be('empty)
-      scrapedData.url should be("http://www.beachape.com/downloads/code/scala/schwatcher_example.scala/")
+      scrapedData.url should be("http://www.beachape.com/downloads/code/scala/schwatcher_example.scala")
       scrapedData.mainImageUrl should be('empty)
       scrapedData.imageUrls should be('empty)
     }

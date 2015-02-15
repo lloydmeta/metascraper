@@ -2,23 +2,21 @@ name := "metascraper"
 
 version := "0.2.5"
 
-scalaVersion := "2.10.2"
+scalaVersion := "2.11.5"
 
-crossScalaVersions := Seq("2.10.0", "2.10.1", "2.10.2", "2.10.3")
+crossScalaVersions := Seq("2.10.4", "2.11.5")
 
 crossVersion := CrossVersion.binary
 
 resolvers += "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/"
 
 libraryDependencies ++= Seq(
-  "org.scalatest" %% "scalatest" % "1.9.1" % "test",
-  "com.typesafe.akka" %% "akka-testkit" % "2.2.3" % "test",
-  "org.codehaus.groovy" % "groovy-all" % "1.8.8" % "test",
-  "co.freeside" % "betamax" % "1.1.2" % "test",
-  "com.typesafe.akka" %% "akka-actor" % "2.2.3",
-  "net.databinder.dispatch" %% "dispatch-core" % "0.11.0",
-  "commons-validator" % "commons-validator" % "1.4.0",
-  "org.jsoup" % "jsoup" % "1.7.2"
+  "org.scalatest" %% "scalatest" % "2.2.4" % "test",
+  "com.typesafe.akka" %% "akka-testkit" % "2.3.9" % "test",
+  "com.typesafe.akka" %% "akka-actor" % "2.3.9",
+  "net.databinder.dispatch" %% "dispatch-core" % "0.11.2",
+  "commons-validator" % "commons-validator" % "1.4.1",
+  "org.jsoup" % "jsoup" % "1.8.1"
 )
 
 publishTo <<= version { v: String =>

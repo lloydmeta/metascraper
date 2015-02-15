@@ -1,7 +1,7 @@
 package com.beachape.metascraper
 
 import com.beachape.metascraper.Messages._
-import com.beachape.metascraper.RichString._
+import com.beachape.metascraper.StringOps._
 import akka.actor.{ActorLogging, ActorRef, Actor, Props}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -54,31 +54,26 @@ class ScraperActor(
 
   import context.dispatcher
 
-  lazy val compressionEnabled = true
-
   // Validator
-  lazy val validSchemas = Seq("http", "https")
-  lazy val urlValidator = new UrlValidator(validSchemas.toArray)
+  val validSchemas = Seq("http", "https")
+  val urlValidator = new UrlValidator(validSchemas.toArray)
 
   // Http client
-  lazy val followRedirects = true
-  lazy val connectionPooling = true
-  lazy val httpExecutorService: ExecutorService = Executors.newFixedThreadPool(httpExecutorThreads)
-  lazy val config = new AsyncHttpClientConfig.Builder()
-    .setExecutorService(httpExecutorService)
+  val followRedirects = true
+  val connectionPooling = true
+  val config = new AsyncHttpClientConfig.Builder()
     .setMaximumConnectionsPerHost(maxConnectionsPerHost)
     .setAllowPoolingConnection(connectionPooling)
     .setAllowSslConnectionPool(connectionPooling)
     .setConnectionTimeoutInMs(connectionTimeoutInMs)
     .setRequestTimeoutInMs(requestTimeoutInMs)
-    .setCompressionEnabled(compressionEnabled)
+    .setCompressionEnabled(true)
     .setFollowRedirects(followRedirects).build
-  lazy val asyncHttpClient = new AsyncHttpClient(config)
-  lazy val httpClient = new Http(asyncHttpClient)
+  val asyncHttpClient = new AsyncHttpClient(config)
+  val httpClient = new Http(asyncHttpClient)
 
   override def postStop() {
     httpClient.shutdown()
-    httpExecutorService.shutdown()
   }
 
   def receive = {
