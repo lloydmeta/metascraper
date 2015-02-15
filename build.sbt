@@ -1,6 +1,6 @@
 name := "metascraper"
 
-version := "0.2.7-SNAPSHOT"
+version := "0.2.7"
 
 scalaVersion := "2.11.5"
 
