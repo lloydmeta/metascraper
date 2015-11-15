@@ -29,6 +29,7 @@ trait DocsSupport {
     withOgTagsDoc,
     withoutAnyTagsDoc,
     withOnlyPTagDoc,
-    withOnlyImageRelDoc)
+    withOnlyImageRelDoc
+  )
 
 }

@@ -19,15 +19,19 @@ object Messages {
    * @param schemaFactories Schema factories to use for scraping, defaults to Seq(HtmlSchemas(OpenGraph, and NormalPage)),
    *                        The factories to the left of the list take precednece over those on the right
    */
-  sealed case class ScrapeUrl(url: Url,
+  sealed case class ScrapeUrl(
+    url: Url,
     acceptLanguageCode: String = "en",
     userAgent: String = "Metascraper",
     numberOfImages: Int = 5,
-    schemaFactories: Seq[SchemaFactory] = Seq(HtmlSchemas(OpenGraph, NormalPage)))
+    schemaFactories: Seq[SchemaFactory] = Seq(HtmlSchemas(OpenGraph, NormalPage))
+  )
 
-  sealed case class ScrapedData(url: Url,
+  sealed case class ScrapedData(
+    url: Url,
     title: String,
     description: String,
     mainImageUrl: Url,
-    imageUrls: Seq[Url])
+    imageUrls: Seq[Url]
+  )
 }

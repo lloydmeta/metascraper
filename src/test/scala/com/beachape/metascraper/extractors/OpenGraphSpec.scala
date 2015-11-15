@@ -87,7 +87,8 @@ class OpenGraphSpec extends FunSpec with Matchers with DocsSupport {
             "http://lolol.com/thing2.jpg",
             "http://lolol.com/thing3.jpg",
             "http://lolol.com/thing4.png",
-            "http://lolol.com/thing5.jpg")
+            "http://lolol.com/thing5.jpg"
+          )
 
       }
 

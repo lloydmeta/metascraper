@@ -95,12 +95,14 @@ class NormalPageSpec extends FunSpec with Matchers with DocsSupport {
 
       it("should return the src contents of the image sources") {
         NormalPage(withoutOgTagsDoc).extractImages shouldBe
-          Seq("http://lolol.com/thing1.gif",
+          Seq(
+            "http://lolol.com/thing1.gif",
             "http://lolol.com/thing2.jpg",
             "http://lolol.com/thing3.jpg",
             "http://lolol.com/thing4.png",
             "http://lolol.com/thing5.jpg",
-            "http://lolol.com/thing6.jpg")
+            "http://lolol.com/thing6.jpg"
+          )
 
       }
 
