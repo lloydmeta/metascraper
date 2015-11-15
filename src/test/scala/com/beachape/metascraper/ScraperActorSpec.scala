@@ -73,7 +73,7 @@ class ScraperActorSpec extends TestKit(ActorSystem("testSystem"))
       val Right(scrapedData) = response
       scrapedData.title should be('empty)
       scrapedData.description should be('empty)
-      scrapedData.url should be("http://wwww.beachape.com/downloads/code/scala/schwatcher_example.scala")
+      scrapedData.url should be("http://www.beachape.com/downloads/code/scala/schwatcher_example.scala")
       scrapedData.mainImageUrl should be('empty)
       scrapedData.imageUrls should be('empty)
     }
