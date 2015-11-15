@@ -24,11 +24,24 @@ trait HtmlSchema extends Schema {
 
 }
 
+object HtmlSchemas {
+
+  private val ContentType = "text/html"
+
+  private def supportedContentType(response: Response): Boolean = {
+    Option(response.getContentType).contains(ContentType)
+  }
+}
+
 case class HtmlSchemas(schemas: (Document => HtmlSchema)*) extends SchemaFactory {
 
   def apply(resp: Response): Seq[HtmlSchema] = {
-    val doc = Jsoup.parse(String(resp), resp.getUri.toString)
-    schemas.map(_.apply(doc))
+    if (HtmlSchemas.supportedContentType(resp)) {
+      val doc = Jsoup.parse(String(resp), resp.getUri.toString)
+      schemas.map(_.apply(doc))
+    } else {
+      Nil
+    }
   }
 
 }
