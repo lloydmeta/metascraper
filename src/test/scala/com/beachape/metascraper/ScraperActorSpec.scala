@@ -37,7 +37,7 @@ class ScraperActorSpec extends TestKit(ActorSystem("testSystem"))
       val Right(scrapedData) = response
       scrapedData.title should be("未来のライター Jii！Jii！Jii！")
       scrapedData.description should be("未来のライター【Jii】のテーマソング！ 詳細はこちら→http://jii-lighter.com/ USB充電式電熱線ライター【Jii】はガス不要！風に強い！USB充電で繰り返し使える！安心・安全で環境に優しい！")
-      scrapedData.url should be("http://www.youtube.com/watch?v=G8CeP15EAS8")
+      scrapedData.url should be("https://www.youtube.com/watch?v=G8CeP15EAS8")
       scrapedData.mainImageUrl should (be("https://i.ytimg.com/vi/G8CeP15EAS8/hqdefault.jpg") or be("http://i.ytimg.com/vi/G8CeP15EAS8/hqdefault.jpg"))
       scrapedData.imageUrls should (contain("https://i.ytimg.com/vi/G8CeP15EAS8/hqdefault.jpg") or contain("http://i.ytimg.com/vi/G8CeP15EAS8/hqdefault.jpg"))
     }
@@ -48,7 +48,7 @@ class ScraperActorSpec extends TestKit(ActorSystem("testSystem"))
       response should be('right)
       val Right(scrapedData) = response
       scrapedData.title should startWith("What I imagine entering the job")
-      scrapedData.description should startWith("The Internet's visual storytelling community")
+      scrapedData.description should startWith("Imgur")
       scrapedData.url should be("http://imgur.com/gallery/ndVA6qs")
       scrapedData.mainImageUrl should be("http://i.imgur.com/ndVA6qs.png?fb")
       scrapedData.imageUrls should contain("http://i.imgur.com/ndVA6qs.png?fb")
@@ -73,7 +73,7 @@ class ScraperActorSpec extends TestKit(ActorSystem("testSystem"))
       val Right(scrapedData) = response
       scrapedData.title should be('empty)
       scrapedData.description should be('empty)
-      scrapedData.url should be("https://beachape.com/downloads/code/scala/schwatcher_example.scala")
+      scrapedData.url should be("http://wwww.beachape.com/downloads/code/scala/schwatcher_example.scala")
       scrapedData.mainImageUrl should be('empty)
       scrapedData.imageUrls should be('empty)
     }

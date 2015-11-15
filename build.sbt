@@ -15,6 +15,7 @@ libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-testkit" % "2.3.9" % "test",
   "com.typesafe.akka" %% "akka-actor" % "2.3.9",
   "net.databinder.dispatch" %% "dispatch-core" % "0.11.3",
+  "com.ning" % "async-http-client" % "1.9.31",
   "commons-validator" % "commons-validator" % "1.4.1",
   "org.jsoup" % "jsoup" % "1.8.1"
 )

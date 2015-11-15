@@ -29,7 +29,7 @@ object HtmlSchemas {
   private val ContentType = "text/html"
 
   private def supportedContentType(response: Response): Boolean = {
-    Option(response.getContentType).contains(ContentType)
+    Option(response.getContentType).exists(_.contains(ContentType))
   }
 }
 
