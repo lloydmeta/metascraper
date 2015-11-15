@@ -1,7 +1,6 @@
 package com.beachape.metascraper
 
 import java.io.InputStream
-import java.net.URI
 import java.nio.ByteBuffer
 import java.util
 
@@ -10,7 +9,7 @@ import com.beachape.metascraper.extractors.{ SchemaFactory, DocsSupport, Schema 
 import com.ning.http.client.cookie.Cookie
 import com.ning.http.client.{ FluentCaseInsensitiveStringsMap, Response }
 
-import dispatch.Http
+import dispatch.{ Uri, Http }
 import org.scalatest._
 import org.scalatest.concurrent.{ IntegrationPatience, PatienceConfiguration, ScalaFutures }
 
@@ -113,7 +112,7 @@ class ScraperSpec
 
       def hasResponseStatus: Boolean = ???
 
-      def getUri: URI = ???
+      def getUri = ???
 
       def getHeader(name: String): String = ???
     }

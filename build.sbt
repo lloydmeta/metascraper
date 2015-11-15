@@ -2,9 +2,9 @@ name := "metascraper"
 
 version := "0.2.9-SNAPSHOT"
 
-scalaVersion := "2.11.5"
+scalaVersion := "2.11.7"
 
-crossScalaVersions := Seq("2.10.4", "2.11.5")
+crossScalaVersions := Seq("2.10.5", "2.11.7")
 
 crossVersion := CrossVersion.binary
 
@@ -14,7 +14,7 @@ libraryDependencies ++= Seq(
   "org.scalatest" %% "scalatest" % "2.2.4" % "test",
   "com.typesafe.akka" %% "akka-testkit" % "2.3.9" % "test",
   "com.typesafe.akka" %% "akka-actor" % "2.3.9",
-  "net.databinder.dispatch" %% "dispatch-core" % "0.11.2",
+  "net.databinder.dispatch" %% "dispatch-core" % "0.11.3",
   "commons-validator" % "commons-validator" % "1.4.1",
   "org.jsoup" % "jsoup" % "1.8.1"
 )
