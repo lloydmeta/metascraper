@@ -17,9 +17,6 @@ import scala.util._
 
 object Scraper {
 
-  /**
-   * Content-
-   */
   val ContentTypeHeaderName: String = "Content-Type"
 }
 
