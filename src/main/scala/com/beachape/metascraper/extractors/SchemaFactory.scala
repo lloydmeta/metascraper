@@ -8,6 +8,11 @@ import com.ning.http.client.Response
 trait SchemaFactory extends (Response => Seq[Schema]) {
 
   /**
+   * Supported Content-Types for this [[SchemaFactory]]
+   */
+  def contentTypes: Seq[String]
+
+  /**
    * Based on a [[Response]], returns a list of [[Schema]]
    */
   def apply(s: Response): Seq[Schema]

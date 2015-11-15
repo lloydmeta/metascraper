@@ -6,8 +6,9 @@ import java.util
 
 import com.beachape.metascraper.Messages.ScrapeUrl
 import com.beachape.metascraper.extractors.{ SchemaFactory, DocsSupport, Schema }
+import com.ning.http.client.AsyncHandler.STATE
 import com.ning.http.client.cookie.Cookie
-import com.ning.http.client.{ FluentCaseInsensitiveStringsMap, Response }
+import com.ning.http.client.{ HttpResponseHeaders, FluentCaseInsensitiveStringsMap, Response }
 
 import dispatch.{ Uri, Http }
 import org.scalatest._
@@ -38,6 +39,34 @@ class ScraperSpec
       whenReady(subject.fetch(ScrapeUrl("http://google.com/image.jpg"))) { r =>
         r.mainImageUrl shouldBe "http://google.com/image.jpg"
       }
+    }
+
+  }
+
+  describe("#handleSupportedTypes handler") {
+
+    val htmlHandler = subject.handleSupportedTypes(Seq("text/html"))
+    val htmlRespHeadersMap = {
+      val m = new FluentCaseInsensitiveStringsMap()
+      m.add("Content-Type", "text/html")
+    }
+    val nonHtmlRespHeadersMap = {
+      val m = new FluentCaseInsensitiveStringsMap()
+      m.add("Content-Type", "application/json")
+    }
+
+    it("should create a handler that continues on supported header types") {
+      val r = htmlHandler.onHeadersReceived(new HttpResponseHeaders() {
+        def getHeaders: FluentCaseInsensitiveStringsMap = htmlRespHeadersMap
+      })
+      r shouldBe STATE.CONTINUE
+    }
+
+    it("should create a handler that aborts on unsupported header types") {
+      val r = htmlHandler.onHeadersReceived(new HttpResponseHeaders() {
+        def getHeaders: FluentCaseInsensitiveStringsMap = nonHtmlRespHeadersMap
+      })
+      r shouldBe STATE.ABORT
     }
 
   }
@@ -73,6 +102,7 @@ class ScraperSpec
     }
 
     val factory = new SchemaFactory {
+      val contentTypes = Seq("text/html")
       def apply(s: Response): Seq[Schema] = Seq(scraper1, scraper2)
     }
 
