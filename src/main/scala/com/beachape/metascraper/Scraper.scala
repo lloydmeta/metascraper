@@ -54,8 +54,10 @@ class Scraper(httpClient: Http, urlSchemas: Seq[String])(implicit ec: ExecutionC
   /**
    * Returns [[ScrapedData]] based on the Schemas requested
    *
-   * The list of [[Schema]] are processed from left to right, meaning the ones to the beginning of the
-   * list get precedence over those towards the end
+   * The list of [[Schema]] generated from the list of Schema factories are processed from left to right,
+   * meaning that the ones closer to the beginning of the list get precedence over those towards the end.
+   *
+   * In fact, if an earlier schema successfully extracts data, then later schemas may not even be used.
    */
   def extractData(resp: Response, url: String, schemaFactories: Seq[SchemaFactory], numberOfImages: Int): ScrapedData = {
     if (resp.getStatusCode / 100 == 2) {
