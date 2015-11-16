@@ -6,6 +6,7 @@ import dispatch._
 import java.util.concurrent.Executors
 import com.ning.http.client.{ AsyncHttpClientConfig, AsyncHttpClient }
 
+import scala.concurrent.duration._
 import scala.util.{ Failure, Success }
 
 /**
@@ -23,11 +24,10 @@ object ScraperActor {
    * @return Props for instantiating a ScaperActor
    */
   def apply(
-    httpExecutorThreads: Int = 10,
+    httpExecutorThreads: Int = 20,
     maxConnectionsPerHost: Int = 30,
     connectionTimeoutInMs: Int = 10000,
-    requestTimeoutInMs: Int = 15000
-  ) =
+    requestTimeoutInMs: Int = 15000) =
     Props(
       classOf[ScraperActor],
       httpExecutorThreads,
@@ -35,6 +35,8 @@ object ScraperActor {
       connectionTimeoutInMs,
       requestTimeoutInMs
     )
+
+  private def coreCount = Runtime.getRuntime.availableProcessors()
 }
 
 /**
@@ -44,11 +46,10 @@ object ScraperActor {
  * method
  */
 class ScraperActor(
-  httpExecutorThreads: Int = 10,
+  threadMultiplier: Int = 3,
   maxConnectionsPerHost: Int = 30,
-  connectionTimeoutInMs: Int = 10000,
-  requestTimeoutInMs: Int = 15000
-)
+  connectionTimeout: Duration = 10.seconds,
+  requestTimeout: Duration = 15.seconds)
     extends Actor with ActorLogging {
 
   import context.dispatcher
@@ -57,17 +58,17 @@ class ScraperActor(
   val validSchemas = Seq("http", "https")
   // Http client config
   val followRedirects = true
-  val connectionPooling = true
+  val connectionPooling = false
 
-  private val executorService = Executors.newFixedThreadPool(httpExecutorThreads)
+  private val executorService = Executors.newFixedThreadPool(threadMultiplier * ScraperActor.coreCount)
   private val config = new AsyncHttpClientConfig.Builder()
     .setExecutorService(executorService)
-    .setIOThreadMultiplier(1) // otherwise we might not have enough threads
+    .setIOThreadMultiplier(threadMultiplier)
     .setMaxConnectionsPerHost(maxConnectionsPerHost)
     .setAllowPoolingConnections(connectionPooling)
     .setAllowPoolingSslConnections(connectionPooling)
-    .setConnectTimeout(connectionTimeoutInMs)
-    .setRequestTimeout(requestTimeoutInMs)
+    .setConnectTimeout(connectionTimeout.toMillis.toInt)
+    .setRequestTimeout(requestTimeout.toMillis.toInt)
     .setFollowRedirect(followRedirects).build
   private val asyncHttpClient = new AsyncHttpClient(config)
   private val httpClient = new Http(asyncHttpClient)

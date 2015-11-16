@@ -2,7 +2,8 @@ package com.beachape.metascraper
 
 import com.beachape.metascraper.Messages.{ ScrapedData, ScrapeUrl }
 import com.beachape.metascraper.extractors.{ SchemaFactory, Schema }
-import com.ning.http.client.Response
+import com.ning.http.client.AsyncHandler.STATE
+import com.ning.http.client.{ HttpResponseHeaders, AsyncHandler, Response }
 import dispatch._
 import org.apache.commons.validator.routines.UrlValidator
 import StringOps._
@@ -13,6 +14,12 @@ import scala.util._
 /**
  * Created by Lloyd on 2/15/15.
  */
+
+object Scraper {
+
+  val ContentTypeHeaderName: String = "Content-Type"
+}
+
 class Scraper(httpClient: Http, urlSchemas: Seq[String])(implicit ec: ExecutionContext) {
 
   private val urlValidator = new UrlValidator(urlSchemas.toArray)
@@ -37,9 +44,10 @@ class Scraper(httpClient: Http, urlSchemas: Seq[String])(implicit ec: ExecutionC
         "User-Agent" -> Seq(message.userAgent),
         "Accept-Language" -> Seq(message.acceptLanguageCode)
       )
-      val request = url(messageUrl).setHeaders(requestHeaders)
-      val resp = httpClient(request)
-      resp map (s => extractData(s, messageUrl, message.schemaFactories, message.numberOfImages))
+      val request = url(messageUrl).setHeaders(requestHeaders).toRequest
+      val handler = handleSupportedTypes(supportedContentTypes(message))
+      val resp = httpClient(request, handler)
+      resp.map(s => extractData(s, messageUrl, message.schemaFactories, message.numberOfImages))
     }
   }
 
@@ -51,7 +59,7 @@ class Scraper(httpClient: Http, urlSchemas: Seq[String])(implicit ec: ExecutionC
    */
   def extractData(resp: Response, url: String, schemaFactories: Seq[SchemaFactory], numberOfImages: Int): ScrapedData = {
     if (resp.getStatusCode / 100 == 2) {
-      val schemas = schemaFactories.toStream.flatMap(f => Try(f.apply(resp)).getOrElse(Nil)) // Stream in case we have expensive factories
+      val schemas = schemaFactories.toStream.flatMap(f => Try(f.apply(resp)).getOrElse(Nil)) // Stream to avoid generating schemas if possible
       val maybeUrl = schemas.flatMap(s => Try(s.extractUrl).toOption).find(_.isDefined).getOrElse(None)
       val maybeTitle = schemas.flatMap(s => Try(s.extractTitle).toOption).find(_.isDefined).getOrElse(None)
       val maybeDescription = schemas.flatMap(s => Try(s.extractDescription).toOption).find(_.isDefined).getOrElse(None)
@@ -66,6 +74,24 @@ class Scraper(httpClient: Http, urlSchemas: Seq[String])(implicit ec: ExecutionC
       )
     } else {
       throw StatusCode(resp.getStatusCode)
+    }
+  }
+
+  private[this] def supportedContentTypes(message: ScrapeUrl): Seq[String] = {
+    message.schemaFactories.flatMap(_.contentTypes)
+  }
+
+  /**
+   * Creates an OK response handler that aborts if the response's Content-Type is not in the passed OK types list
+   */
+  private[metascraper] def handleSupportedTypes(okTypes: Seq[String]) = new OkFunctionHandler(identity) {
+    override def onHeadersReceived(headers: HttpResponseHeaders): STATE = {
+      val maybeHeaders = Option(headers.getHeaders)
+      val maybeContentType = maybeHeaders.flatMap(h => Option(h.getFirstValue(Scraper.ContentTypeHeaderName)))
+      maybeContentType match {
+        case Some(respType) if okTypes.exists(okType => respType.contains(okType)) => super.onHeadersReceived(headers)
+        case _ => STATE.ABORT
+      }
     }
   }
 
