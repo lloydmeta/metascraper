@@ -14,7 +14,7 @@ class ScraperActorSpec extends TestKit(ActorSystem("testSystem"))
     with BeforeAndAfter
     with ImplicitSender {
 
-  val scraperActorRef = TestActorRef(new ScraperActor)
+  val scraperActorRef = TestActorRef(ScraperActor())
 
   describe("integration testing by sending ScrapeUrl messages") {
 

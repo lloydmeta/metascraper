@@ -12,12 +12,12 @@ resolvers += "Typesafe Repository" at "http://repo.typesafe.com/typesafe/release
 
 libraryDependencies ++= Seq(
   "org.scalatest" %% "scalatest" % "2.2.4" % "test",
-  "com.typesafe.akka" %% "akka-testkit" % "2.3.9" % "test",
-  "com.typesafe.akka" %% "akka-actor" % "2.3.9",
+  "com.typesafe.akka" %% "akka-testkit" % "2.3.14" % "test",
+  "com.typesafe.akka" %% "akka-actor" % "2.3.14",
   "net.databinder.dispatch" %% "dispatch-core" % "0.11.3",
   "com.ning" % "async-http-client" % "1.9.31",
   "commons-validator" % "commons-validator" % "1.4.1",
-  "org.jsoup" % "jsoup" % "1.8.1"
+  "org.jsoup" % "jsoup" % "1.8.3"
 )
 
 publishTo <<= version { v: String =>
