@@ -35,6 +35,8 @@ object ScraperActor {
       connectionTimeoutInMs,
       requestTimeoutInMs
     )
+
+  private def coreCount = Runtime.getRuntime.availableProcessors()
 }
 
 /**
@@ -44,7 +46,7 @@ object ScraperActor {
  * method
  */
 class ScraperActor(
-  httpExecutorThreads: Int = 10,
+  threadMultiplier: Int = 3,
   maxConnectionsPerHost: Int = 30,
   connectionTimeout: Duration = 10.seconds,
   requestTimeout: Duration = 15.seconds)
@@ -58,10 +60,10 @@ class ScraperActor(
   val followRedirects = true
   val connectionPooling = false
 
-  private val executorService = Executors.newFixedThreadPool(httpExecutorThreads)
+  private val executorService = Executors.newFixedThreadPool(threadMultiplier * ScraperActor.coreCount)
   private val config = new AsyncHttpClientConfig.Builder()
     .setExecutorService(executorService)
-    .setIOThreadMultiplier(1)
+    .setIOThreadMultiplier(threadMultiplier)
     .setMaxConnectionsPerHost(maxConnectionsPerHost)
     .setAllowPoolingConnections(connectionPooling)
     .setAllowPoolingSslConnections(connectionPooling)
