@@ -17,23 +17,25 @@ object ScraperActor {
   /**
    * Factory method for the params required to instantiate a MonitorActor
    *
-   * @param httpExecutorThreads Int number of threads to use for this actor's async HTTP executor service
+   * @param threadMultiplier Int multiplier to calculate the number of threads to use for
+   *                         this actor's async HTTP executor service. The number of cores found by
+   *                         the JVM is multiplied by this factor to get the number of threads.
    * @param maxConnectionsPerHost Int max connections at a time per host
-   * @param connectionTimeoutInMs Int time in milliseconds before timing out when trying to make a connection to a host
-   * @param requestTimeoutInMs Int time in milliseconds before timing out when waiting for a request to complete after connection
+   * @param connectionTimeout Duration before timing out when trying to make a connection to a host
+   * @param requestTimeout Duration before timing out when waiting for a request to complete after connection
    * @return Props for instantiating a ScaperActor
    */
   def apply(
-    httpExecutorThreads: Int = 20,
+    threadMultiplier: Int = 3,
     maxConnectionsPerHost: Int = 30,
-    connectionTimeoutInMs: Int = 10000,
-    requestTimeoutInMs: Int = 15000) =
+    connectionTimeout: Duration = 10.seconds,
+    requestTimeout: Duration = 15.seconds): Props =
     Props(
       classOf[ScraperActor],
-      httpExecutorThreads,
+      threadMultiplier,
       maxConnectionsPerHost,
-      connectionTimeoutInMs,
-      requestTimeoutInMs
+      connectionTimeout,
+      requestTimeout
     )
 
   private def coreCount = Runtime.getRuntime.availableProcessors()
