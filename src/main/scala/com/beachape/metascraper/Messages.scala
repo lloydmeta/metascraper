@@ -24,14 +24,12 @@ object Messages {
     acceptLanguageCode: String = "en",
     userAgent: String = "Metascraper",
     numberOfImages: Int = 5,
-    schemaFactories: Seq[SchemaFactory] = Seq(HtmlSchemas(OpenGraph, NormalPage))
-  )
+    schemaFactories: Seq[SchemaFactory] = Seq(HtmlSchemas(OpenGraph, NormalPage)))
 
   sealed case class ScrapedData(
     url: Url,
     title: String,
     description: String,
     mainImageUrl: Url,
-    imageUrls: Seq[Url]
-  )
+    imageUrls: Seq[Url])
 }
