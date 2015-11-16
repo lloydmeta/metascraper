@@ -15,7 +15,7 @@ import scala.util.{ Failure, Success }
 object ScraperActor {
 
   /**
-   * Factory method for the params required to instantiate a MonitorActor
+   * Factory method for the params required to instantiate a ScraperActor
    *
    * @param threadMultiplier Int multiplier to calculate the number of threads to use for
    *                         this actor's async HTTP executor service. The number of cores found by
