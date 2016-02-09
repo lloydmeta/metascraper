@@ -1,7 +1,10 @@
 package com.beachape.metascraper.extractors.html
 
+import java.nio.charset.Charset
+
 import com.beachape.metascraper.extractors.{ SchemaFactory, Schema }
 import com.ning.http.client.Response
+import com.ning.http.util.AsyncHttpProviderUtils
 import dispatch.as.String
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -29,8 +32,22 @@ case class HtmlSchemas(schemas: (Document => HtmlSchema)*) extends SchemaFactory
   val contentTypes: Seq[String] = Seq("text/html")
 
   def apply(resp: Response): Seq[HtmlSchema] = {
-    val doc = Jsoup.parse(String(resp), resp.getUri.toString)
+    val doc = parse(resp)
     schemas.map(_.apply(doc))
   }
 
+  protected def parse(resp: Response): Document =
+    Jsoup.parse(decode(resp), resp.getUri.toString)
+
+  protected def decode(resp: Response): String = {
+    val charset = responseCharset(resp.getContentType).getOrElse(String.utf8)
+    charset(resp)
+  }
+
+  protected def responseCharset(contentType: String): Option[String.charset] =
+    for {
+      ct <- Option { contentType }
+      charset <- Option { AsyncHttpProviderUtils.parseCharset(ct) }
+      if Charset.isSupported(charset)
+    } yield String.charset(Charset.forName(charset))
 }
