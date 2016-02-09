@@ -1,6 +1,6 @@
 name := "metascraper"
 
-version := "0.3.4-SNAPSHOT"
+version := "0.3.4"
 
 scalaVersion := "2.11.7"
 
@@ -55,7 +55,7 @@ pomExtra := (
     <developer>
       <id>lloydmeta</id>
       <name>Lloyd Chan</name>
-      <url>http://beachape.com</url>
+      <url>https://beachape.com</url>
     </developer>
   </developers>
 )
