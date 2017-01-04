@@ -36,15 +36,15 @@ case class HtmlSchemas(schemas: (Document => HtmlSchema)*) extends SchemaFactory
     schemas.map(_.apply(doc))
   }
 
-  protected def parse(resp: Response): Document =
-    Jsoup.parse(decode(resp), resp.getUri.toString)
-
-  protected def decode(resp: Response): String = {
-    val charset = responseCharset(resp.getContentType).getOrElse(String.utf8)
-    charset(resp)
+  protected def parse(resp: Response): Document = {
+    val detectedFromResp = responseCharset(resp)
+    Jsoup.parse(detectedFromResp(resp), resp.getUri.toString)
   }
 
-  protected def responseCharset(contentType: String): Option[String.charset] =
+  protected def responseCharset(resp: Response): String.charset =
+    tryFromContentType(resp.getContentType).getOrElse(String.utf8)
+
+  protected def tryFromContentType(contentType: String): Option[String.charset] =
     for {
       ct <- Option { contentType }
       charset <- Option { AsyncHttpProviderUtils.parseCharset(ct) }
