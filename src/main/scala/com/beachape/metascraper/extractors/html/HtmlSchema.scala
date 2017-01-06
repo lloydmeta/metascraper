@@ -2,6 +2,7 @@ package com.beachape.metascraper.extractors.html
 
 import java.nio.charset.Charset
 
+import scala.collection.convert.decorateAsScala._
 import com.beachape.metascraper.extractors.{ SchemaFactory, Schema }
 import com.ning.http.client.Response
 import com.ning.http.util.AsyncHttpProviderUtils
@@ -28,7 +29,7 @@ trait HtmlSchema extends Schema {
 }
 
 case class HtmlSchemas(schemas: (Document => HtmlSchema)*) extends SchemaFactory {
-
+  val defaultCharset = String.utf8
   val contentTypes: Seq[String] = Seq("text/html")
 
   def apply(resp: Response): Seq[HtmlSchema] = {
@@ -36,15 +37,38 @@ case class HtmlSchemas(schemas: (Document => HtmlSchema)*) extends SchemaFactory
     schemas.map(_.apply(doc))
   }
 
-  protected def parse(resp: Response): Document =
-    Jsoup.parse(decode(resp), resp.getUri.toString)
+  protected def parse(resp: Response): Document = {
+    def parseWith(charset: String.charset) = Jsoup.parse(charset(resp), resp.getUri.toString)
 
-  protected def decode(resp: Response): String = {
-    val charset = responseCharset(resp.getContentType).getOrElse(String.utf8)
-    charset(resp)
+    val detectedFromResp = responseCharset(resp)
+    val doc = parseWith(detectedFromResp.getOrElse(defaultCharset))
+
+    detectedFromResp match {
+      case Some(_) =>
+        // HTTP response has Content-Type, it overrides the page settings, so use it
+        doc
+
+      case None =>
+        // Read the page <meta> and re-parse if found
+        docCharset(doc).filterNot(defaultCharset.==).map(parseWith).getOrElse(doc)
+    }
   }
 
-  protected def responseCharset(contentType: String): Option[String.charset] =
+  protected def responseCharset(resp: Response): Option[String.charset] =
+    tryFromContentType(resp.getContentType)
+
+  protected def docCharset(doc: Document): Option[String.charset] = {
+    val html5 = doc.select("meta[charset]").asScala.flatMap { e =>
+      tryFromContentType(s"text/html; charset=${e.attr("charset")}")
+    }
+    val html = doc.select("meta[http-equiv=Content-Type]").asScala.collect {
+      case e if e.hasAttr("content") => tryFromContentType(e.attr("content"))
+    }.flatten
+
+    (html5 ++ html).headOption
+  }
+
+  protected def tryFromContentType(contentType: String): Option[String.charset] =
     for {
       ct <- Option { contentType }
       charset <- Option { AsyncHttpProviderUtils.parseCharset(ct) }
