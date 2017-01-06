@@ -18,7 +18,7 @@ libraryDependencies += "com.beachape.metascraper" %% "metascraper" % version
 If the above does not work because it cannot be resolved, its likely because it hasn't been synced to Maven central yet.
 In that case, download a SNAPSHOT release of the same version by adding this to `build.sbt`
 
-```
+```scala
 resolvers += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
 
 libraryDependencies += "com.beachape.metascraper" %% "metascraper" % s"$version-SNAPSHOT"
