@@ -1,4 +1,4 @@
-# Metascraper [![Build Status](https://travis-ci.org/lloydmeta/metascraper.svg?branch=master)](https://travis-ci.org/lloydmeta/metascraper) [![Coverage Status](https://coveralls.io/repos/lloydmeta/metascraper/badge.svg?branch=master)](https://coveralls.io/r/lloydmeta/metascraper?branch=master)
+# Metascraper [![Build Status](https://travis-ci.org/lloydmeta/metascraper.svg?branch=master)](https://travis-ci.org/lloydmeta/metascraper) [![Coverage Status](https://coveralls.io/repos/lloydmeta/metascraper/badge.svg?branch=master)](https://coveralls.io/r/lloydmeta/metascraper?branch=master) [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.beachape.metascraper/metascraper_2.11/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.beachape.metascraper/metascraper_2.11)
 
 A non-blocking Scala library that allows you to retrieve meta data from various URLs.
 
@@ -12,7 +12,7 @@ Tested against Scala 2.10.x, 2.11.x.
 Add the following to your `build.sbt`
 
 ```scala
-libraryDependencies += "com.beachape.metascraper" %% "metascraper" % "0.3.4"
+libraryDependencies += "com.beachape.metascraper" %% "metascraper" % version
 ```
 
 If the above does not work because it cannot be resolved, its likely because it hasn't been synced to Maven central yet.
@@ -21,7 +21,7 @@ In that case, download a SNAPSHOT release of the same version by adding this to 
 ```
 resolvers += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
 
-libraryDependencies += "com.beachape.metascraper" %% "metascraper" % "0.3.4-SNAPSHOT"
+libraryDependencies += "com.beachape.metascraper" %% "metascraper" % s"$version-SNAPSHOT"
 ```
 
 ## Example usage
