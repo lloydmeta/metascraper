@@ -23,11 +23,11 @@ class ScraperActorSpec extends TestKit(ActorSystem("testSystem"))
       val response = receiveOne(30 seconds).asInstanceOf[Either[Throwable, ScrapedData]]
       response should be('right)
       val Right(scrapedData) = response
-      scrapedData.title should be("About Me - BeachApe.")
-      scrapedData.description should startWith("Sep 5th, 2013 My name is Lloyd Chan")
+      scrapedData.title should be("About me")
+      scrapedData.description should startWith("A collection of findings, snippets and thoughts. My name is Lloyd, a software engineer. In another life, I was a biomedical engineer.")
       scrapedData.url should be("https://beachape.com/about/")
-      scrapedData.mainImageUrl shouldBe "https://beachape.com/images/rss.png"
-      scrapedData.imageUrls should contain("https://beachape.com/images/rss.png")
+      scrapedData.mainImageUrl shouldBe "https://beachape.com/images/okinawa-hacker.jpg"
+      scrapedData.imageUrls should contain("https://beachape.com/images/okinawa-hacker.jpg")
     }
 
     it("should return proper data for a redirecting URL") {
@@ -50,8 +50,8 @@ class ScraperActorSpec extends TestKit(ActorSystem("testSystem"))
       scrapedData.title should be("The Plot Twist: E-Book Sales Slip, and Print Is Far From Dead")
       scrapedData.description should be("With readers on a reverse migration to print, the “e-book terror has kind of subsided” for bookstores and publishers.")
       scrapedData.url should be("http://www.nytimes.com/2015/09/23/business/media/the-plot-twist-e-book-sales-slip-and-print-is-far-from-dead.html")
-      scrapedData.mainImageUrl shouldBe "http://static01.nyt.com/images/2015/09/23/business/23jpEBOOKS1/23jpEBOOKS1-facebookJumbo.jpg"
-      scrapedData.imageUrls shouldBe Seq("http://static01.nyt.com/images/2015/09/23/business/23jpEBOOKS1/23jpEBOOKS1-facebookJumbo.jpg", "http://static01.nyt.com/images/2015/09/23/business/23jpEBOOKS1/23jpEBOOKS1-master675.jpg", "http://static01.nyt.com/images/2015/09/23/business/23jpEBOOKS2/23jpEBOOKS2-articleLarge.jpg")
+      scrapedData.mainImageUrl shouldBe "https://static01.nyt.com/images/2015/09/23/business/23jpEBOOKS1/23jpEBOOKS1-facebookJumbo.jpg"
+      scrapedData.imageUrls shouldBe Stream("https://static01.nyt.com/images/2015/09/23/business/23jpEBOOKS1/23jpEBOOKS1-facebookJumbo.jpg", "https://static01.nyt.com/images/2015/09/23/business/23jpEBOOKS1/23jpEBOOKS1-master1050.jpg", "https://static01.nyt.com/images/2015/09/23/business/23jpEBOOKS2/23jpEBOOKS2-master675.jpg")
     }
 
     it("should return proper data for a URL with a page that does not contain OG links") {
