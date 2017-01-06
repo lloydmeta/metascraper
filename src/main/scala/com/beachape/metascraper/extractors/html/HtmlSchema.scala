@@ -50,7 +50,7 @@ case class HtmlSchemas(schemas: (Document => HtmlSchema)*) extends SchemaFactory
 
       case None =>
         // Read the page <meta> and re-parse if found
-        docCharset(doc).map(parseWith).getOrElse(doc)
+        docCharset(doc).filterNot(defaultCharset.==).map(parseWith).getOrElse(doc)
     }
   }
 
