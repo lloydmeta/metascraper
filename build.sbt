@@ -2,27 +2,27 @@ name := "metascraper"
 
 version := "0.3.5-SNAPSHOT"
 
-scalaVersion := "2.11.7"
+scalaVersion := "2.11.8"
 
-crossScalaVersions := Seq("2.10.5", "2.11.7")
+crossScalaVersions := Seq("2.10.6", "2.11.8")
 
 crossVersion := CrossVersion.binary
 
 resolvers += "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/"
 
 libraryDependencies ++= Seq(
-  "org.scalatest" %% "scalatest" % "2.2.4" % "test",
-  "com.typesafe.akka" %% "akka-testkit" % "2.3.14" % "test",
-  "com.typesafe.akka" %% "akka-actor" % "2.3.14",
+  "org.scalatest" %% "scalatest" % "3.0.1" % "test",
+  "com.typesafe.akka" %% "akka-testkit" % "2.3.16" % "test",
+  "com.typesafe.akka" %% "akka-actor" % "2.3.16",
   "net.databinder.dispatch" %% "dispatch-core" % "0.11.3",
-  "com.ning" % "async-http-client" % "1.9.31",
-  "commons-validator" % "commons-validator" % "1.4.1",
-  "org.jsoup" % "jsoup" % "1.8.3"
+  "com.ning" % "async-http-client" % "1.9.40",
+  "commons-validator" % "commons-validator" % "1.5.1",
+  "org.jsoup" % "jsoup" % "1.10.2"
 )
 
-publishTo <<= version { v: String =>
+publishTo := {
   val nexus = "https://oss.sonatype.org/"
-  if (v.trim.endsWith("SNAPSHOT"))
+  if (version.value.trim.endsWith("SNAPSHOT"))
     Some("snapshots" at nexus + "content/repositories/snapshots")
   else
     Some("releases" at nexus + "service/local/staging/deploy/maven2")
