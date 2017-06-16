@@ -49,7 +49,7 @@ class ScraperActorSpec extends TestKit(ActorSystem("testSystem"))
       val Right(scrapedData) = response
       scrapedData.title should be("The Plot Twist: E-Book Sales Slip, and Print Is Far From Dead")
       scrapedData.description should be("With readers on a reverse migration to print, the “e-book terror has kind of subsided” for bookstores and publishers.")
-      scrapedData.url should be("http://www.nytimes.com/2015/09/23/business/media/the-plot-twist-e-book-sales-slip-and-print-is-far-from-dead.html")
+      scrapedData.url should be("https://www.nytimes.com/2015/09/23/business/media/the-plot-twist-e-book-sales-slip-and-print-is-far-from-dead.html")
       scrapedData.mainImageUrl shouldBe "https://static01.nyt.com/images/2015/09/23/business/23jpEBOOKS1/23jpEBOOKS1-facebookJumbo.jpg"
       scrapedData.imageUrls shouldBe Stream("https://static01.nyt.com/images/2015/09/23/business/23jpEBOOKS1/23jpEBOOKS1-facebookJumbo.jpg", "https://static01.nyt.com/images/2015/09/23/business/23jpEBOOKS1/23jpEBOOKS1-master1050.jpg", "https://static01.nyt.com/images/2015/09/23/business/23jpEBOOKS2/23jpEBOOKS2-master675.jpg")
     }
