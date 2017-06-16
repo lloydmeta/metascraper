@@ -10,7 +10,7 @@ import com.ning.http.client.AsyncHandler.STATE
 import com.ning.http.client.cookie.Cookie
 import com.ning.http.client.{ HttpResponseHeaders, FluentCaseInsensitiveStringsMap, Response }
 
-import dispatch.{ Uri, Http }
+import dispatch.Http
 import org.scalatest._
 import org.scalatest.concurrent.{ IntegrationPatience, PatienceConfiguration, ScalaFutures }
 

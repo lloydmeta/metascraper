@@ -3,7 +3,7 @@ package com.beachape.metascraper
 import com.beachape.metascraper.Messages.{ ScrapedData, ScrapeUrl }
 import com.beachape.metascraper.extractors.{ SchemaFactory, Schema }
 import com.ning.http.client.AsyncHandler.STATE
-import com.ning.http.client.{ HttpResponseHeaders, AsyncHandler, Response }
+import com.ning.http.client.{ HttpResponseHeaders, Response }
 import dispatch._
 import org.apache.commons.validator.routines.UrlValidator
 import StringOps._

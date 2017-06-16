@@ -2,7 +2,7 @@ package com.beachape.metascraper.extractors.html
 
 import java.nio.charset.Charset
 
-import scala.collection.convert.decorateAsScala._
+import scala.collection.JavaConverters._
 import com.beachape.metascraper.extractors.{ SchemaFactory, Schema }
 import com.ning.http.client.Response
 import com.ning.http.util.AsyncHttpProviderUtils

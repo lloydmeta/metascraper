@@ -1,7 +1,7 @@
 package com.beachape.metascraper
 
 import com.beachape.metascraper.extractors.html.{ HtmlSchemas, OpenGraph, NormalPage }
-import com.beachape.metascraper.extractors.{ SchemaFactory, Schema }
+import com.beachape.metascraper.extractors.SchemaFactory
 
 /**
  * Message case classes for actor
