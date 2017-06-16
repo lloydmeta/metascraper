@@ -5,8 +5,8 @@ import org.jsoup.nodes.Document
 import scala.collection.JavaConverters._
 
 /**
- * Created by Lloyd on 2/15/15.
- */
+  * Created by Lloyd on 2/15/15.
+  */
 case class OpenGraph(doc: Document) extends HtmlSchema {
 
   def extractUrl: Option[String] = nonEmptyContent(doc, "meta[property=og:url]")

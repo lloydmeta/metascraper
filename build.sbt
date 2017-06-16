@@ -60,7 +60,9 @@ pomExtra := (
   </developers>
 )
 
-scalariformSettings
+scalafmtOnCompile := true
+
+scalafmtVersion := "1.0.0-RC3"
 
 def theAkkaVersion(scalaVersion: String) =
   CrossVersion.partialVersion(scalaVersion) match {
