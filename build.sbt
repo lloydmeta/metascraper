@@ -11,13 +11,13 @@ crossVersion := CrossVersion.binary
 resolvers += "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/"
 
 libraryDependencies ++= Seq(
-  "org.scalatest" %% "scalatest" % "3.0.1" % Test,
-  "com.typesafe.akka" %% "akka-testkit" % theAkkaVersion(scalaVersion.value) % Test,
-  "com.typesafe.akka" %% "akka-actor" % theAkkaVersion(scalaVersion.value),
-  "net.databinder.dispatch" %% "dispatch-core" % theDispatchVersion(scalaVersion.value),
-  "com.ning" % "async-http-client" % "1.9.40",
-  "commons-validator" % "commons-validator" % "1.6",
-  "org.jsoup" % "jsoup" % "1.10.3"
+  "org.scalatest"           %% "scalatest"        % "3.0.1" % Test,
+  "com.typesafe.akka"       %% "akka-testkit"     % theAkkaVersion(scalaVersion.value) % Test,
+  "com.typesafe.akka"       %% "akka-actor"       % theAkkaVersion(scalaVersion.value),
+  "net.databinder.dispatch" %% "dispatch-core"    % theDispatchVersion(scalaVersion.value),
+  "com.ning"                % "async-http-client" % "1.9.40",
+  "commons-validator"       % "commons-validator" % "1.6",
+  "org.jsoup"               % "jsoup"             % "1.10.3"
 )
 
 publishTo := {
@@ -34,7 +34,9 @@ publishMavenStyle := true
 
 publishArtifact in Test := false
 
-pomIncludeRepository := { _ => false }
+pomIncludeRepository := { _ =>
+  false
+}
 
 scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature", "-Xlint", "-Xlog-free-terms")
 
@@ -62,7 +64,7 @@ pomExtra := (
 
 scalafmtOnCompile := true
 
-scalafmtVersion := "1.0.0-RC3"
+scalafmtVersion := "1.0.0-RC4"
 
 def theAkkaVersion(scalaVersion: String) =
   CrossVersion.partialVersion(scalaVersion) match {
