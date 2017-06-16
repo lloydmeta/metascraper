@@ -2,11 +2,11 @@ package com.beachape.metascraper.extractors
 
 import com.beachape.metascraper.extractors.html.NormalPage
 import org.jsoup.Jsoup
-import org.scalatest.{ Matchers, FunSpec }
+import org.scalatest.{Matchers, FunSpec}
 
 /**
- * Created by Lloyd on 2/15/15.
- */
+  * Created by Lloyd on 2/15/15.
+  */
 class NormalPageSpec extends FunSpec with Matchers with DocsSupport {
 
   describe("#extractUrl") {
@@ -14,10 +14,12 @@ class NormalPageSpec extends FunSpec with Matchers with DocsSupport {
     describe("for docs without a base Url") {
 
       it("should return None") {
-        docs.map { doc =>
-          val subject = NormalPage(doc)
-          subject.extractUrl
-        }.forall(_ == None) shouldBe true
+        docs
+          .map { doc =>
+            val subject = NormalPage(doc)
+            subject.extractUrl
+          }
+          .forall(_ == None) shouldBe true
       }
 
     }
@@ -76,7 +78,8 @@ class NormalPageSpec extends FunSpec with Matchers with DocsSupport {
     describe("for a page with just p tags") {
 
       it("should return the contents of the first p") {
-        NormalPage(withOnlyPTagDoc).extractDescription.get should include("is an object-functional programming and scripting language for general software applications")
+        NormalPage(withOnlyPTagDoc).extractDescription.get should include(
+          "is an object-functional programming and scripting language for general software applications")
       }
     }
   }
@@ -140,7 +143,8 @@ class NormalPageSpec extends FunSpec with Matchers with DocsSupport {
     describe("for a page with an image rel tag") {
 
       it("should return the src content of the image_rel") {
-        NormalPage(withOnlyImageRelDoc).extractMainImage shouldBe Some("http://lala.com/theMainImage.png")
+        NormalPage(withOnlyImageRelDoc).extractMainImage shouldBe Some(
+          "http://lala.com/theMainImage.png")
       }
 
     }

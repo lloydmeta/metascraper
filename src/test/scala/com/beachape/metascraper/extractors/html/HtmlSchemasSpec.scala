@@ -3,14 +3,14 @@ package com.beachape.metascraper.extractors.html
 import java.io.InputStream
 import java.nio.ByteBuffer
 import java.util
-import com.ning.http.client.{ FluentCaseInsensitiveStringsMap, Response }
+import com.ning.http.client.{FluentCaseInsensitiveStringsMap, Response}
 import com.ning.http.client.cookie.Cookie
-import org.scalatest.{ FunSpec, Matchers }
+import org.scalatest.{FunSpec, Matchers}
 import org.jsoup.nodes.Document
 
 /**
- * Created by alaz on 04.01.17.
- */
+  * Created by alaz on 04.01.17.
+  */
 class HtmlSchemasSpec extends FunSpec with Matchers {
   /*
     curl -i http://www.interfax.ru/russia/491014
@@ -34,7 +34,8 @@ X-Frame-Options: SAMEORIGIN
    */
 
   def resp(contentType: String, body: String) = new Response {
-    def getResponseBodyExcerpt(maxLength: Int, charset: String): String = body.replace("CHARSET", charset)
+    def getResponseBodyExcerpt(maxLength: Int, charset: String): String =
+      body.replace("CHARSET", charset)
 
     def getResponseBodyExcerpt(maxLength: Int): String = body
 
@@ -137,8 +138,10 @@ X-Frame-Options: SAMEORIGIN
       resultFrom(factory(resp("text/html", Html5)).head.doc) should equal("UTF-8")
     }
     it("should use HTTP Content-Type when not specified on page") {
-      resultFrom(factory(resp("text/html; charset=windows-1251", Html)).head.doc) should equal("windows-1251")
-      resultFrom(factory(resp("text/html; charset=windows-1251", Html5)).head.doc) should equal("windows-1251")
+      resultFrom(factory(resp("text/html; charset=windows-1251", Html)).head.doc) should equal(
+        "windows-1251")
+      resultFrom(factory(resp("text/html; charset=windows-1251", Html5)).head.doc) should equal(
+        "windows-1251")
     }
     it("should use HTML `http-equiv`") {
       resultFrom(factory(resp("text/html", Html_httpequiv)).head.doc) should equal("windows-1251")
@@ -153,8 +156,10 @@ X-Frame-Options: SAMEORIGIN
       resultFrom(factory(resp("text/html", Html5_both)).head.doc) should equal("windows-1251")
     }
     it("should use HTTP Content-Type over page <meta>") {
-      resultFrom(factory(resp("text/html; charset=UTF-8", Html_httpequiv)).head.doc) should equal("UTF-8")
-      resultFrom(factory(resp("text/html; charset=UTF-8", Html5_charset)).head.doc) should equal("UTF-8")
+      resultFrom(factory(resp("text/html; charset=UTF-8", Html_httpequiv)).head.doc) should equal(
+        "UTF-8")
+      resultFrom(factory(resp("text/html; charset=UTF-8", Html5_charset)).head.doc) should equal(
+        "UTF-8")
     }
   }
 }

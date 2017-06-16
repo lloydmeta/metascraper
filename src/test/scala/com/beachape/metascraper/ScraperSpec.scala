@@ -5,18 +5,18 @@ import java.nio.ByteBuffer
 import java.util
 
 import com.beachape.metascraper.Messages.ScrapeUrl
-import com.beachape.metascraper.extractors.{ SchemaFactory, DocsSupport, Schema }
+import com.beachape.metascraper.extractors.{SchemaFactory, DocsSupport, Schema}
 import com.ning.http.client.AsyncHandler.STATE
 import com.ning.http.client.cookie.Cookie
-import com.ning.http.client.{ HttpResponseHeaders, FluentCaseInsensitiveStringsMap, Response }
+import com.ning.http.client.{HttpResponseHeaders, FluentCaseInsensitiveStringsMap, Response}
 
-import dispatch.{ Uri, Http }
+import dispatch.Http
 import org.scalatest._
-import org.scalatest.concurrent.{ IntegrationPatience, PatienceConfiguration, ScalaFutures }
+import org.scalatest.concurrent.{IntegrationPatience, PatienceConfiguration, ScalaFutures}
 
 /**
- * Created by Lloyd on 2/15/15.
- */
+  * Created by Lloyd on 2/15/15.
+  */
 class ScraperSpec
     extends FunSpec
     with Matchers
@@ -102,7 +102,7 @@ class ScraperSpec
     }
 
     val factory = new SchemaFactory {
-      val contentTypes = Seq("text/html")
+      val contentTypes                    = Seq("text/html")
       def apply(s: Response): Seq[Schema] = Seq(scraper1, scraper2)
     }
 

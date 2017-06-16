@@ -5,7 +5,7 @@ A non-blocking Scala library that allows you to retrieve meta data from various 
 Out of the box, supports HTML content (works with OpenGraph as well as normal HTML meta/image tags), but can be easily extended to
 support any kind of content (just implement `Schema` and `SchemaFactory`) so that you can work with any URL that returns an Array of Bytes.
 
-Tested against Scala 2.10.x, 2.11.x.
+Tested against Scala 2.10.x, 2.11.x, and 2.12.x.
 
 ## Installation
 

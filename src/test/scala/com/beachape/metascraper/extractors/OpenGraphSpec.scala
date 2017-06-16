@@ -4,8 +4,8 @@ import com.beachape.metascraper.extractors.html.OpenGraph
 import org.scalatest._
 
 /**
- * Created by Lloyd on 2/15/15.
- */
+  * Created by Lloyd on 2/15/15.
+  */
 class OpenGraphSpec extends FunSpec with Matchers with DocsSupport {
 
   val subject = OpenGraph
@@ -61,7 +61,8 @@ class OpenGraphSpec extends FunSpec with Matchers with DocsSupport {
     describe("for a page with a og:description tag") {
 
       it("should return the contents of the og:description tag") {
-        OpenGraph(withOgTagsDoc).extractDescription shouldBe Some("Description inside og:description tag")
+        OpenGraph(withOgTagsDoc).extractDescription shouldBe Some(
+          "Description inside og:description tag")
       }
 
     }
