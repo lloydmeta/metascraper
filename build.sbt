@@ -64,8 +64,6 @@ pomExtra := (
 
 scalafmtOnCompile := true
 
-scalafmtVersion := "1.0.0-RC4"
-
 def theAkkaVersion(scalaVersion: String) =
   CrossVersion.partialVersion(scalaVersion) match {
     case Some((2, scalaMajor)) if scalaMajor >= 11 => "2.5.2"
