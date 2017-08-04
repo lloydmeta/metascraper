@@ -1,6 +1,6 @@
 name := "metascraper"
 
-version := "0.3.7-SNAPSHOT"
+version := "0.4.0"
 
 scalaVersion := "2.11.11"
 
@@ -64,8 +64,8 @@ scalafmtOnCompile := true
 
 def theDispatchVersion(scalaVersion: String) =
   CrossVersion.partialVersion(scalaVersion) match {
-    case Some((2, scalaMajor)) if scalaMajor >= 11 => "0.12.2"
-    case Some((2, scalaMajor)) if scalaMajor == 10 => "0.11.3"
+    case Some((2, scalaMajor)) if scalaMajor >= 11 => "0.12.3"
+    case Some((2, scalaMajor)) if scalaMajor == 10 => "0.11.4"
     case _ =>
       throw new IllegalArgumentException(s"Unsupported Scala version $scalaVersion")
   }
